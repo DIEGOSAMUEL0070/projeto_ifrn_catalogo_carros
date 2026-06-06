@@ -1,0 +1,22 @@
+[
+    {
+        "id": "2e6f5244-9753-415e-b596-bca39864bbc1",
+        "nome": "fiat uno 2004",
+        "ano": "2004",
+        "preco": "20535",
+        "cor": "Branco",
+        "cambio": "Manual",
+        "marca": "Fiat",
+        "combustivel": "Gasolina"
+    },
+    {
+        "id": "c17a1cc5-1646-4e1e-a89d-7211b37f832b",
+        "nome": "Chevrolet Onix",
+        "ano": "2010",
+        "preco": "30000",
+        "cor": "Branco",
+        "cambio": "Automático",
+        "marca": "Chevrolet",
+        "combustivel": "Gasolina"
+    }
+]

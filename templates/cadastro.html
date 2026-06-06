@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Cadastro</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <div class="home_container">
+
+        <div class="home_card">
+
+            <div class="voltar_a_esquerda">
+                <a class="voltar" href="/">← Voltar</a>
+            </div>
+            
+            <h1>Criar Conta</h1>
+
+            <form method="POST">
+
+                <div class="input_group">
+
+                    <input type="text" name="usuario" placeholder="Usuário" required>
+
+                </div>
+
+                <div class="input_group">
+
+                    <input type="password" name="senha" placeholder="Senha" required>
+
+                </div>
+
+                {% if erro %}
+                <div class="erro_texto">
+                    {{ erro }}
+                </div>
+                {% endif %}
+
+                <button type="submit">
+                    Criar Conta
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
