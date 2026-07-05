@@ -10,198 +10,201 @@
 
 <body>
     <div class="container">
-        <h1>Sistema de Catálogo de Carros</h1>
-        <a class="voltar" href="/">← Voltar</a>
-
-        <form method="POST" action="/cadastrar">
-            <div class="input_group">
-                <input name="modelo" placeholder="Modelo de Carro" title="Por favor, preencha o nome do carro" required>
-                {% if erro_modelo %}
-                <span class="erro_texto">{{ erro_modelo }}</span>
-                {% endif %}
+        <div class="page_header">
+            <div>
+                <h1>Sistema de Catálogo de Carros</h1>
+                <div class="header_actions">
+                    <a class="voltar" href="/">← Voltar</a>
+                    <a class="logout_button" href="/logout">Sair</a>
+                </div>
             </div>
-
-            <div class="input_group">
-                <input name="preco" placeholder="Preço" type="number" title="Por favor, preencha o preço do carro"
-                    required>
-                {% if erro_preco %}
-                <span class="erro_texto">{{ erro_preco }}</span>
-                {% endif %}
-            </div>
-
-            <select name="ano" title="Por favor, preencha o ano do carro" required>
-                <option value="">Ano de Fabricação</option>
-
-                {% for c in anos %}
-
-                <option value="{{ c }}" {% if valor_ano==c %}selected{% endif %}>{{ c }}</option>
-
-                {% endfor %}
-            </select>
-
-            <select name="cor" title="Por favor, preencha a cor do carro" required>
-                <option value="">Cor do Carro</option>
-
-                {% for c in cores %}
-
-                <option value="{{ c }}" {% if valor_cor==c %}selected{% endif %}>{{ c }}</option>
-
-                {% endfor %}
-            </select>
-
-            <select name="tipo_cambio" title="Por favor, preencha o tipo de câmbio do carro" required>
-                <option value="">Tipo de Câmbio</option>
-
-                {% for c in cambios %}
-
-                <option value="{{ c }}" {% if valor_tipo_cambio==c %}selected{% endif %}>{{ c }}</option>
-
-                {% endfor %}
-            </select>
-
-            <select name="marca" title="Por favor, preencha a marca do carro" required>
-                <option value="">Marca</option>
-
-                {% for c in marcas %}
-
-                <option value="{{ c }}" {% if valor_marca==c %}selected{% endif %}>{{ c }}</option>
-
-                {% endfor %}
-            </select>
-
-            <select name="tipo_combustivel" title="Por favor, preencha o tipo de combustível do carro" required>
-                <option value="">Combustíveis</option>
-
-                {% for c in combustiveis %}
-
-                <option value="{{ c }}" {% if valor_tipo_combustivel==c %}selected{% endif %}>{{ c }}</option>
-
-                {% endfor %}
-            </select>
-
-            <button type="submit">Adicionar</button>
-        </form>
-        <div class="filtros">
-            <h1>Aplicar filtros</h1>
-            <form method="GET" action="/carros">
-                <select name="ano">
-                    <option value="">Todos os Anos</option>
-
-                    {% for c in anos %}
-
-                    <option value="{{ c }}" {% if request.args.get('ano')==c %}selected{% endif %}>
-                        {{ c }}
-                    </option>
-
-                    {% endfor %}
-                </select>
-
-                <select name="cor">
-                    <option value="">Todas as Cores</option>
-
-                    {% for c in cores %}
-
-                    <option value="{{ c }}" {% if request.args.get('cor')==c %}selected{% endif %}>
-                        {{ c }}
-                    </option>
-
-                    {% endfor %}
-                </select>
-
-                <select name="tipo_cambio">
-                    <option value="">Todos os Câmbios</option>
-
-                    {% for c in cambios %}
-
-                    <option value="{{ c }}" {% if request.args.get('tipo_cambio')==c %}selected{% endif %}>
-                        {{ c }}
-                    </option>
-
-                    {% endfor %}
-                </select>
-
-                <select name="marca">
-                    <option value="">Todas as Marcas</option>
-
-                    {% for c in marcas %}
-
-                    <option value="{{ c }}" {% if request.args.get('marca')==c %}selected{% endif %}>
-                        {{ c }}
-                    </option>
-
-                    {% endfor %}
-                </select>
-
-                <select name="tipo_combustivel">
-                    <option value="">Todos os Combustíveis</option>
-
-                    {% for c in combustiveis %}
-
-                    <option value="{{ c }}" {% if request.args.get('tipo_combustivel')==c %}selected{% endif %}>
-                        {{ c }}
-                    </option>
-
-                    {% endfor %}
-                </select>
-
-                <button type="submit">Filtrar</button>
-            </form>
         </div>
 
-        <ul>
+
+        <div class="secao">
+            <div class="secao_titulo">
+                <h2>Cadastrar Novo Carro</h2>
+            </div>
+
+            <div class="cadastro_card">
+                <form method="POST" action="/cadastrar">
+
+                    <div class="input_group">
+                        <input name="modelo" placeholder="Modelo de Carro" title="Por favor, preencha o nome do carro" required>
+                        {% if erro_modelo %}
+                        <span class="erro_texto">{{ erro_modelo }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="input_group">
+                        <input name="preco" placeholder="Preço" type="number" title="Por favor, preencha o preço do carro"
+                            required>
+
+                        {% if erro_preco %}
+                        <span class="erro_texto">{{ erro_preco }}</span>
+                        {% endif %}
+                    </div>
+                
+                    <select name="ano" title="Por favor, preencha o ano do carro" required>
+                        <option value="">Ano de Fabricação</option>
+                
+                        {% for c in anos %}
+                        <option value="{{ c }}" {% if valor_ano==c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="marca" title="Por favor, preencha a marca do carro" required>
+                        <option value="">Marca</option>
+                
+                        {% for c in marcas %}
+                        <option value="{{ c }}" {% if valor_marca==c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="cor" title="Por favor, preencha a cor do carro" required>
+                        <option value="">Cor do Carro</option>
+                
+                        {% for c in cores %}
+                        <option value="{{ c }}" {% if valor_cor==c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="tipo_cambio" title="Por favor, preencha o tipo de câmbio do carro" required>
+                        <option value="">Tipo de Câmbio</option>
+                
+                        {% for c in cambios %}
+                        <option value="{{ c }}" {% if valor_tipo_cambio==c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="tipo_combustivel" title="Por favor, preencha o tipo de combustível do carro" required>
+                        <option value="">Combustíveis</option>
+            
+                        {% for c in combustiveis %}
+                        <option value="{{ c }}" {% if valor_tipo_combustivel==c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+
+
+                    <button type="submit">Adicionar</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="secao">
+            <div class="secao_titulo">
+                <h2>Filtros</h2>
+            </div>
+
+            <div class="filtros">
+                <form method="GET" action="/carros" class="filtros_bar">
+                    <select name="ano">
+                        <option value="">Todos os Anos</option>
+    
+                        {% for c in anos %}
+                        <option value="{{ c }}" {% if request.args.get('ano')==c %}selected{% endif %}>
+                            {{ c }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select name="marca">
+                        <option value="">Todas as Marcas</option>
+    
+                        {% for c in marcas %}
+    
+                        <option value="{{ c }}" {% if request.args.get('marca')==c %}selected{% endif %}>
+                            {{ c }}
+                        </option>
+    
+                        {% endfor %}
+                    </select>
+
+                    <select name="cor">
+                        <option value="">Todas as Cores</option>
+    
+                        {% for c in cores %}
+                        <option value="{{ c }}" {% if request.args.get('cor')==c %}selected{% endif %}>
+                            {{ c }}
+                        </option>
+                        {% endfor %}
+                    </select>
+    
+                    <select name="tipo_cambio">
+                        <option value="">Todos os Câmbios</option>
+    
+                        {% for c in cambios %}
+                        <option value="{{ c }}" {% if request.args.get('tipo_cambio')==c %}selected{% endif %}>
+                            {{ c }}
+                        </option>
+                        {% endfor %}
+                    </select>
+    
+                    <select name="tipo_combustivel">
+                        <option value="">Todos os Combustíveis</option>
+    
+                        {% for c in combustiveis %}
+                        <option value="{{ c }}" {% if request.args.get('tipo_combustivel')==c %}selected{% endif %}>
+                            {{ c }}
+                        </option>
+                        {% endfor %}
+                    </select>
+    
+                    <button type="submit">Filtrar</button>
+                </form>
+            </div>
+
+
+        </div>
+
+        <div class="secao_titulo">
+            <h2>Carros Cadastrados</h2>
+        </div>
+        
+        <ul class="carros_grid">
             {% for carro in carros %}
             <li>
-                
-                <div class="carro_info">
-                    <div class="carro_titulo">{{ carro.modelo }}</div>
-                    <div class="carro_info_item">
-                        <div class="carro_info_categoria">Ano</div>
-                        <div class="carro_info_valor">{{ carro.ano }}</div>
+                <div class="carro_card">
+                    <div class="carro_card_header">
+                        <div>
+                            <div class="carro_marca">{{ carro.marca }}</div>
+                            <div class="carro_titulo">{{ carro.modelo }}</div>
+                        </div>
                     </div>
 
-                    <div class="carro_info_item">
-                        <div class="carro_info_categoria">Preço</div>
-                        <div class="carro_info_valor">{{ carro.preco }}</div>
+                    <div class="carro_preco">{{ carro.preco }}</div>
+
+                    <div class="carro_specificacoes">
+                        <div class="carro_info_item">
+                            <div class="carro_info_categoria">Ano</div>
+                            <div class="carro_info_valor">{{ carro.ano }}</div>
+                        </div>
+                        <div class="carro_info_item">
+                            <div class="carro_info_categoria">Cor</div>
+                            <div class="carro_info_valor">{{ carro.cor }}</div>
+                        </div>
+                        <div class="carro_info_item">
+                            <div class="carro_info_categoria">Câmbio</div>
+                            <div class="carro_info_valor">{{ carro.tipo_cambio }}</div>
+                        </div>
+                        <div class="carro_info_item">
+                            <div class="carro_info_categoria">Combustível</div>
+                            <div class="carro_info_valor">{{ carro.tipo_combustivel }}</div>
+                        </div>
                     </div>
 
-                    <div class="carro_info_item">
-                        <div class="carro_info_categoria">Cor</div>
-                        <div class="carro_info_valor">{{ carro.cor }}</div>
+                    <div class="actions">
+                        <a class="editar" href="/editar/{{ carro.id }}">✏</a>
+                        <a class="deletar" href="/deletar/{{ carro.id }}">✖</a>
                     </div>
-
-                    <div class="carro_info_item">
-                        <div class="carro_info_categoria">Câmbio</div>
-                        <div class="carro_info_valor">{{ carro.tipo_cambio }}</div>
-                    </div>
-
-                    <div class="carro_info_item">
-                        <div class="carro_info_categoria">Marca</div>
-                        <div class="carro_info_valor">{{ carro.marca }}</div>
-                    </div>
-
-                    <div class="carro_info_item">
-                        <div class="carro_info_categoria">Combustível</div>
-                        <div class="carro_info_valor">{{ carro.tipo_combustivel }}</div>
-                    </div>
-                </div>
-
-                <div class="actions">
-                    <a class="editar" href="/editar/{{ carro.id }}">✏</a>
-                    <a class="deletar" href="/deletar/{{ carro.id }}">✖</a>
                 </div>
             </li>
 
             {% else %}
-
-            <li>Nenhum carro encontrado</li>
-
+            <li class="vazio_estado">Nenhum carro encontrado.</li>
             {% endfor %}
         </ul>
     </div>
-
-    <a href="/logout">
-        Sair
-    </a>
 
 </body>
 

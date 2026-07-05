@@ -10,95 +10,85 @@
 
 <body>
     <div class="container">
-        <h1>Editar Informações do Carro</h1>
-        <a class="voltar"href="/carros">← Voltar</a>
-        <form method="POST">
-            <div class="input_group">
-                <input name="modelo" value="{{ carro.modelo }}" placeholder="Modelo do carro" required>
-
-                {% if erro_modelo %}
-
-                <span class="erro_texto">{{ erro_modelo }}</span>
-
-                {% endif %}
+        <div class="page_header">
+            <div>
+                <h1>Editar Informações do Carro</h1>
+                <a class="voltar"href="/carros">← Voltar</a>
             </div>
-
-            <div class="input_group">
-                <input name="preco" value="{{ carro.preco }}">
-
-                {% if erro_preco %}
-
-                <span class="erro_texto">{{ erro_preco }}</span>
-
-                {% endif %}
-            </div>
-
-            <select name="ano">
-                <option value="">Selecione um Ano</option>
-
-                {% for ano in anos %}
-                
-                <option value="{{ ano }}" {% if carro.ano==ano %}selected{% endif %}>
-                    {{ ano }}
-                </option>
-
-                {% endfor %}
-            </select>
-
-            <select name="cor">
-                <option value="">Selecione uma Cor</option>
-
-                {% for cor in cores %}
-
-                <option value="{{ cor }}" {% if carro.cor==cor %}selected{% endif %}>
-                    {{ cor }}
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-            <select name="tipo_cambio">
-                <option value="">Selecione um Câmbio</option>
-
-                {% for cambio in cambios %}
-
-                <option value="{{ cambio }}" {% if carro.tipo_cambio==cambio %}selected{% endif %}>
-                    {{ cambio }}
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-            <select name="marca">
-                <option value="">Selecione uma Marca</option>
-
-                {% for marca in marcas %}
-                
-                <option value="{{ marca }}" {% if carro.marca==marca %}selected{% endif %}>
-                    {{ marca }}
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-            <select name="tipo_combustivel">
-                <option value="">Selecione um Tipo de Combustível</option>
-
-                {% for combustivel in combustiveis %}
-
-                <option value="{{ combustivel }}" {% if carro.tipo_combustivel==combustivel %}selected{% endif %}>
-                    {{ combustivel }}
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-            <button type="submit">Salva Alterações</button>
-        </form>
+        </div>
+        
+        <div class="cadastro_card">
+            <form method="POST">
+                <div class="input_group">
+                    <input name="modelo" value="{{ carro.modelo }}" placeholder="Modelo do carro" required>
+    
+                    {% if erro_modelo %}
+                    <span class="erro_texto">{{ erro_modelo }}</span>
+                    {% endif %}
+                </div>
+    
+                <div class="input_group">
+                    <input name="preco" value="{{ carro.preco }}">
+    
+                    {% if erro_preco %}
+                    <span class="erro_texto">{{ erro_preco }}</span>
+                    {% endif %}
+                </div>
+    
+                <select name="ano">
+                    <option value="">Selecione um Ano</option>
+    
+                    {% for ano in anos %}
+                    <option value="{{ ano }}" {% if carro.ano==ano %}selected{% endif %}>
+                        {{ ano }}
+                    </option>
+                    {% endfor %}
+                </select>
+    
+                <select name="cor">
+                    <option value="">Selecione uma Cor</option>
+    
+                    {% for cor in cores %}
+                    <option value="{{ cor }}" {% if carro.cor==cor %}selected{% endif %}>
+                        {{ cor }}
+                    </option>
+                    {% endfor %}
+                </select>
+    
+                <select name="tipo_cambio">
+                    <option value="">Selecione um Câmbio</option>
+    
+                    {% for cambio in cambios %}
+                    <option value="{{ cambio }}" {% if carro.tipo_cambio==cambio %}selected{% endif %}>
+                        {{ cambio }}
+                    </option>
+                    {% endfor %}
+    
+                </select>
+    
+                <select name="marca">
+                    <option value="">Selecione uma Marca</option>
+    
+                    {% for marca in marcas %}
+                    <option value="{{ marca }}" {% if carro.marca==marca %}selected{% endif %}>
+                        {{ marca }}
+                    </option>
+                    {% endfor %}
+                </select>
+    
+                <select name="tipo_combustivel">
+                    <option value="">Selecione um Tipo de Combustível</option>
+    
+                    {% for combustivel in combustiveis %}
+                    <option value="{{ combustivel }}" {% if carro.tipo_combustivel==combustivel %}selected{% endif %}>
+                        {{ combustivel }}
+                    </option>
+                    {% endfor %}
+                </select>
+    
+                <button type="submit">Salvar Alterações</button>
+            </form>
+        </div>
     </div>
 </body>
 

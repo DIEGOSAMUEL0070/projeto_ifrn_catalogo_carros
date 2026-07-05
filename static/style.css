@@ -96,25 +96,6 @@ button:hover {
     transform: scale(1.03);
 }
 
-.filtros form {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.acoes {
-    margin-top: 15px;
-    text-align: right;
-}
-
-.acoes a {
-    background: #673AB7;
-    color: white;
-    padding: 8px 14px;
-    border-radius: 8px;
-    text-decoration: none;
-}
-
 ul {
     list-style: none;
     padding: 0;
@@ -131,29 +112,6 @@ li {
     align-items: center;
 }
 
-.tag {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-.tag.estudo {
-    background: #e3f2fd;
-    color: #1565c0;
-}
-
-.tag.trabalho {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.tag.pessoal {
-    background: #fff3e0;
-    color: #ef6c00;
-}
-
 .carro_card {
     background: #fffffff2;
     padding: 20px;
@@ -168,29 +126,8 @@ li {
     font-weight: bold;
     color: #00132C;
     margin-bottom: 10px;
-}
-
-.carro_info {
-    gap: 10px;
-    margin: 5px 0;
-}
-
-.carro_info_item {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.carro_info_categoria {
-    font-size: 11px;
-    text-transform: uppercase;
-    color: #5f5f5f;
-    font-weight: bold;
-}
-
-.carro_info_valor {
-    font-size: 14px;
-    color: #00132C;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .editar {
@@ -291,11 +228,12 @@ li {
     display: inline-block;
     background: #d32f2f;
     color: white;
-    padding: 10px 15px;
+    padding: 12px 17px;
     border-radius: 8px;
     text-decoration: none;
     font-weight: bold;
     transition: 0.3s;
+    margin: 10px 0px;
 }
 
 .logout_button:hover {
@@ -310,4 +248,177 @@ li {
     padding: 8px 12px;
     border-radius: 8px;
     border-left: 4px solid #2e7d32;
+}
+
+.page_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.page_header h1 {
+    margin: 0;
+    text-align: left;
+}
+
+.header_actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap; 
+}
+
+.secao {
+    margin-bottom: 35px;
+}
+
+.secao_titulo {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 8px;
+}
+
+.secao_titulo h2 {
+    margin: 0;
+    color: #00132C;
+    font-size: 20px;
+}
+
+.secao_titulo .contador {
+    font-size: 13px;
+    color: #777;
+    font-weight: bold;
+}
+
+.cadastro_card {
+    background: #f4f7fb;
+    border: 1px solid #dce4ee;
+    border-radius: 14px;
+    padding: 25px;
+}
+
+.cadastro_card form {
+    grid-template-columns: repeat(2, 1fr);
+    display: grid;
+    gap: 15px;
+}
+
+.cadastro_card .input_group {
+    grid-column: span 2;
+}
+
+.cadastro_card button {
+    grid-column: span 2;
+    margin: 0;
+}
+
+@media (max-width: 640px) {
+    .cadastro_card form {
+        grid-template-columns: 1fr;
+    }
+    .cadastro_card .input_group,
+    .cadastro_card button {
+        grid-column: span 1;
+    }
+}
+
+.filtros {
+    margin-top: 0;
+}
+
+.filtros_bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.filtros_bar select {
+    padding: 8px 10px;
+    font-size: 13px;
+}
+
+.filtros_bar button {
+    margin: 0;
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+.limpar_filtros {
+    font-size: 13px;
+    color: #d32f2f;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.carros_grid {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+.carros_grid li {
+    display: block;
+    padding: 0;
+    margin: 0;
+    background: none;
+    border-radius: 0;
+}
+
+.carro_card_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.carro_marca {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #3587d4;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.carro_preco {
+    font-size: 20px;
+    font-weight: bold;
+    color: #00132C;
+    margin: 8px 0 14px;
+}
+
+.carro_preco::before {
+    content: "R$ ";
+    font-size: 13px;
+    color: #777777;
+}
+
+.carro_specificacoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+    padding-top: 12px;
+    border-top: 1px solid #eeeeee;
+}
+
+.vazio_estado {
+    text-align: center;
+    padding: 40px;
+    color: #888888;
+    background: #ffffff99;
+    border-radius: 12px;
 }
