@@ -78,6 +78,13 @@ if not cores:
 
     salvar_json(CORES_FILE, cores)
 
+if not anos:
+    anos = [
+        str(ano) for ano in range(2001, 2020)
+    ]
+
+    salvar_json(ANOS_FILE, anos)
+
 def usuario_logado():
     return session.get("usuario")
 
@@ -193,9 +200,9 @@ def carros_page():
     if not usuario_logado():
         return redirect(url_for("login"))
     ano = request.args.get("ano")
-    cambio = request.args.get("cambio")
+    tipo_cambio = request.args.get("tipo_cambio")
     marca = request.args.get("marca")
-    combustivel = request.args.get("combustivel")
+    tipo_combustivel = request.args.get("tipo_combustivel")
     cor = request.args.get("cor")
 
     carros_filtrados = carros
@@ -206,10 +213,10 @@ def carros_page():
             if carro["ano"] == ano
         ]
 
-    if cambio:
+    if tipo_cambio:
         carros_filtrados = [
             carro for carro in carros_filtrados
-            if carro["cambio"] == cambio
+            if carro["tipo_cambio"] == tipo_cambio
         ]
     
     if marca:
@@ -218,10 +225,10 @@ def carros_page():
             if carro["marca"] == marca
         ]
     
-    if combustivel:
+    if tipo_combustivel:
         carros_filtrados = [
             carro for carro in carros_filtrados
-            if carro["combustivel"] == combustivel
+            if carro["tipo_combustivel"] == tipo_combustivel
         ]
     
     if cor:
@@ -242,22 +249,22 @@ def carros_page():
 
 @app.route("/cadastrar", methods=["POST"])
 def cadastrar():
-
-    nome = request.form.get("nome")
+    
+    modelo = request.form.get("modelo")
     ano = request.form.get("ano")
     preco = request.form.get("preco")
     cor = request.form.get("cor")
-    cambio = request.form.get("cambio")
+    tipo_cambio = request.form.get("tipo_cambio")
     marca = request.form.get("marca")
-    combustivel = request.form.get("combustivel")
+    tipo_combustivel = request.form.get("tipo_combustivel")
 
-    erro_nome = None
+    erro_modelo = None
     erro_preco = None
 
-    if nome:
-        nome = nome.strip()
+    if modelo:
+        nome = modelo.strip()
         if len(nome) < 10 or len(nome) >= 100:
-            erro_nome = "Nome inválido. O nome deve ter pelo menos 10 caracteres. Tente novamente!"
+            erro_modelo = "Modelo inválido. Deve ter pelo entre 10 e 100 caracteres. Tente novamente!"
             nome = None 
 
     if preco:
@@ -275,27 +282,27 @@ def cadastrar():
             erro_preco = "O valor digitado é inválido. O preço deve ser um número. Tente novamente!"
             preco = None
 
-    if nome and preco:
+    if modelo and preco:
         if not ano:
             ano = "Não informado"
         if not cor:
             cor = "Não informada"
-        if not cambio:
-            cambio = "Não informado"
+        if not tipo_cambio:
+            tipo_cambio = "Não informado"
         if not marca:
             marca = "Não informada"
-        if not combustivel:
-            combustivel = "Não informado"
+        if not tipo_combustivel:
+            tipo_combustivel = "Não informado"
             
         carros.append({
             "id": gerar_id(),
-            "nome": nome,
+            "modelo": modelo,
             "ano": ano,
             "preco": preco,
             "cor": cor,
-            "cambio": cambio,
+            "tipo_cambio": tipo_cambio,
             "marca": marca,
-            "combustivel": combustivel,
+            "tipo_combustivel": tipo_combustivel,
         }) 
 
         salvar_json(CARROS_FILE, carros)
@@ -309,16 +316,16 @@ def cadastrar():
         marcas=marcas,
         combustiveis=combustiveis,
         carros=carros,
-        erro_nome=erro_nome,
+        erro_modelo=erro_modelo,
         erro_preco=erro_preco,
 
-        valor_nome=nome,
+        valor_modelo=modelo,
         valor_ano=ano,
         valor_preco=preco,
         valor_cor=cor,
-        valor_cambio=cambio,
+        valor_tipo_cambio=tipo_cambio,
         valor_marca=marca,
-        valor_combustivel=combustivel
+        valor_tipo_combustivel=tipo_combustivel
     )
 
 @app.route("/deletar/<string:id>")
@@ -338,24 +345,25 @@ def editar(id):
     if not carro:
         return redirect(url_for("carros_page"))
 
-    erro_nome = None
+    erro_modelo = None
     erro_preco = None
 
     if request.method == "POST":
 
-        nome = request.form.get("nome")
+        modelo = request.form.get("modelo")
         ano = request.form.get("ano")
         preco = request.form.get("preco")
         cor = request.form.get("cor")
-        cambio = request.form.get("cambio")
+        tipo_cambio = request.form.get("tipo_cambio")
         marca = request.form.get("marca")
-        combustivel = request.form.get("combustivel")
+        tipo_combustivel = request.form.get("tipo_combustivel")
 
-        if nome:
-            nome = nome.strip()
-            if len(nome) < 10:
-                erro_nome = "Nome inválido. O nome deve ter pelo menos 10 caracteres. Tente novamente!"
-                nome = None 
+        if modelo:
+            modelo = modelo.strip()
+        
+        if not modelo or len(modelo) < 10 or len(modelo) >= 100:
+            erro_modelo = "Modelo inválido. Deve ter entre 10 e 100 caracteres. Tente novamente!"
+            modelo = None 
 
         if preco:
             try:
@@ -371,16 +379,18 @@ def editar(id):
             except ValueError:
                 erro_preco = "O valor digitado é inválido. O preço deve ser um número. Tente novamente!"
                 preco = None
+        else:
+            erro_preco = "O Preço é obrigatório."
 
-        if not erro_nome and not erro_preco:
+        if not erro_modelo and not erro_preco:
 
-            carro["nome"] = nome
+            carro["modelo"] = modelo
             carro["ano"] = ano
             carro["preco"] = preco
             carro["cor"] = cor
-            carro["cambio"] = cambio
+            carro["tipo_cambio"] = tipo_cambio
             carro["marca"] = marca
-            carro["combustivel"] = combustivel
+            carro["tipo_combustivel"] = tipo_combustivel
 
             salvar_json(CARROS_FILE, carros)
 
@@ -394,7 +404,7 @@ def editar(id):
         cambios=cambios,
         marcas=marcas,
         combustiveis=combustiveis,
-        erro_nome=erro_nome,
+        erro_modelo=erro_modelo,
         erro_preco=erro_preco
     )
 

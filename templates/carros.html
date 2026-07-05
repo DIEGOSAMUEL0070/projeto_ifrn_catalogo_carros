@@ -15,9 +15,9 @@
 
         <form method="POST" action="/cadastrar">
             <div class="input_group">
-                <input name="nome" placeholder="Nome" title="Por favor, preencha o nome do carro" required>
-                {% if erro_nome %}
-                <span class="erro_texto">{{ erro_nome }}</span>
+                <input name="modelo" placeholder="Modelo de Carro" title="Por favor, preencha o nome do carro" required>
+                {% if erro_modelo %}
+                <span class="erro_texto">{{ erro_modelo }}</span>
                 {% endif %}
             </div>
 
@@ -49,12 +49,12 @@
                 {% endfor %}
             </select>
 
-            <select name="cambio" title="Por favor, preencha o tipo de câmbio do carro" required>
+            <select name="tipo_cambio" title="Por favor, preencha o tipo de câmbio do carro" required>
                 <option value="">Tipo de Câmbio</option>
 
                 {% for c in cambios %}
 
-                <option value="{{ c }}" {% if valor_cambio==c %}selected{% endif %}>{{ c }}</option>
+                <option value="{{ c }}" {% if valor_tipo_cambio==c %}selected{% endif %}>{{ c }}</option>
 
                 {% endfor %}
             </select>
@@ -69,12 +69,12 @@
                 {% endfor %}
             </select>
 
-            <select name="combustivel" title="Por favor, preencha o tipo de combustível do carro" required>
+            <select name="tipo_combustivel" title="Por favor, preencha o tipo de combustível do carro" required>
                 <option value="">Combustíveis</option>
 
                 {% for c in combustiveis %}
 
-                <option value="{{ c }}" {% if valor_combustivel==c %}selected{% endif %}>{{ c }}</option>
+                <option value="{{ c }}" {% if valor_tipo_combustivel==c %}selected{% endif %}>{{ c }}</option>
 
                 {% endfor %}
             </select>
@@ -108,12 +108,12 @@
                     {% endfor %}
                 </select>
 
-                <select name="cambio">
+                <select name="tipo_cambio">
                     <option value="">Todos os Câmbios</option>
 
                     {% for c in cambios %}
 
-                    <option value="{{ c }}" {% if request.args.get('cambio')==c %}selected{% endif %}>
+                    <option value="{{ c }}" {% if request.args.get('tipo_cambio')==c %}selected{% endif %}>
                         {{ c }}
                     </option>
 
@@ -132,12 +132,12 @@
                     {% endfor %}
                 </select>
 
-                <select name="combustivel">
+                <select name="tipo_combustivel">
                     <option value="">Todos os Combustíveis</option>
 
                     {% for c in combustiveis %}
 
-                    <option value="{{ c }}" {% if request.args.get('combustivel')==c %}selected{% endif %}>
+                    <option value="{{ c }}" {% if request.args.get('tipo_combustivel')==c %}selected{% endif %}>
                         {{ c }}
                     </option>
 
@@ -153,7 +153,7 @@
             <li>
                 
                 <div class="carro_info">
-                    <div class="carro_titulo">{{ carro.nome }}</div>
+                    <div class="carro_titulo">{{ carro.modelo }}</div>
                     <div class="carro_info_item">
                         <div class="carro_info_categoria">Ano</div>
                         <div class="carro_info_valor">{{ carro.ano }}</div>
@@ -165,18 +165,13 @@
                     </div>
 
                     <div class="carro_info_item">
-                        <div class="carro_info_categoria">Ano</div>
-                        <div class="carro_info_valor">{{ carro.ano }}</div>
-                    </div>
-
-                    <div class="carro_info_item">
                         <div class="carro_info_categoria">Cor</div>
                         <div class="carro_info_valor">{{ carro.cor }}</div>
                     </div>
 
                     <div class="carro_info_item">
                         <div class="carro_info_categoria">Câmbio</div>
-                        <div class="carro_info_valor">{{ carro.cambio }}</div>
+                        <div class="carro_info_valor">{{ carro.tipo_cambio }}</div>
                     </div>
 
                     <div class="carro_info_item">
@@ -186,7 +181,7 @@
 
                     <div class="carro_info_item">
                         <div class="carro_info_categoria">Combustível</div>
-                        <div class="carro_info_valor">{{ carro.combustivel }}</div>
+                        <div class="carro_info_valor">{{ carro.tipo_combustivel }}</div>
                     </div>
                 </div>
 

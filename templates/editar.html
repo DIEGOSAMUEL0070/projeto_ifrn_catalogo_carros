@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
@@ -14,11 +14,11 @@
         <a class="voltar"href="/carros">← Voltar</a>
         <form method="POST">
             <div class="input_group">
-                <input name="nome" value="{{ carro.nome }}" placeholder="Nome do carro" required>
+                <input name="modelo" value="{{ carro.modelo }}" placeholder="Modelo do carro" required>
 
-                {% if erro_nome %}
+                {% if erro_modelo %}
 
-                <span class="erro_texto">{{ erro_nome }}</span>
+                <span class="erro_texto">{{ erro_modelo }}</span>
 
                 {% endif %}
             </div>
@@ -58,12 +58,12 @@
 
             </select>
 
-            <select name="cambio">
+            <select name="tipo_cambio">
                 <option value="">Selecione um Câmbio</option>
 
                 {% for cambio in cambios %}
 
-                <option value="{{ cambio }}" {% if carro.cambio==cambio %}selected{% endif %}>
+                <option value="{{ cambio }}" {% if carro.tipo_cambio==cambio %}selected{% endif %}>
                     {{ cambio }}
                 </option>
 
@@ -84,12 +84,12 @@
 
             </select>
 
-            <select name="combustivel">
+            <select name="tipo_combustivel">
                 <option value="">Selecione um Tipo de Combustível</option>
 
                 {% for combustivel in combustiveis %}
 
-                <option value="{{ combustivel }}" {% if carro.combustivel==combustivel %}selected{% endif %}>
+                <option value="{{ combustivel }}" {% if carro.tipo_combustivel==combustivel %}selected{% endif %}>
                     {{ combustivel }}
                 </option>
 
@@ -97,7 +97,7 @@
 
             </select>
 
-            <button type="submit">Salva Alteraçõesr</button>
+            <button type="submit">Salva Alterações</button>
         </form>
     </div>
 </body>
