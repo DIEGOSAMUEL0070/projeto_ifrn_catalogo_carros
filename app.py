@@ -6,6 +6,8 @@ import os
 
 app = Flask(__name__)
 
+app.secret_key = "fc_company"
+
 CARROS_FILE = "database/carros_cadastrados.json"
 CAMBIOS_FILE = "database/cambio.json"
 MARCAS_FILE = "database/marca.json"
