@@ -2,10 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import uuid
 import json
 import os
+# import model (Para a conexão do BD posteriormente)
 
 app = Flask(__name__)
-
-app.secret_key = "fc_company"
 
 CARROS_FILE = "database/carros_cadastrados.json"
 CAMBIOS_FILE = "database/cambio.json"
