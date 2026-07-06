@@ -19,10 +19,10 @@ USUARIOS_FILE = "database/usuarios.json"
 def carregar_json(arquivo):
     if not os.path.exists(arquivo):
         return []
-    
+   
     with open(arquivo, "r", encoding="utf-8") as f:
         return json.load(f)
-    
+   
 def salvar_json(arquivo, dados):
     with open(arquivo, "w", encoding="utf-8") as f:
         json.dump(dados, f, indent=4, ensure_ascii=False)
@@ -46,8 +46,8 @@ if not cambios:
 if not marcas:
     marcas = [
         "Chevrolet",
-        "Fiat", 
-        "Ford", 
+        "Fiat",
+        "Ford",
         "Hyundai",
         "Toyota",
         "Volkswagen",
@@ -86,7 +86,7 @@ if not anos:
     salvar_json(ANOS_FILE, anos)
 
 def usuario_logado():
-    return session.get("usuario")
+    return session.get("logado", False)
 
 def gerar_id():
     return str(uuid.uuid4())
@@ -94,105 +94,82 @@ def gerar_id():
 def buscar_carro(id):
     return next((carro for carro in carros if carro["id"] == id), None)
 
+def autenticar_usuario(usuario, senha):
+    for user in usuarios:
+        if user["usuario"] == usuario and user["senha"] == senha:
+            return True
+    return False
+
 @app.route("/")
 def home():
     return render_template("home.html")
-    
+   
+@app.route("/login", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
+    if usuario_logado():
+        return redirect(url_for("carros_page"))
+   
     erro = None
 
     if request.method == "POST":
-
-        usuario = request.form.get("usuario")
-        senha = request.form.get("senha")
-
-        if usuario:
-            usuario = usuario.strip()
-        if senha:
-            senha = senha.strip()
-        if usuario and (len(usuario) < 3 or len(usuario) > 40):
+        usuario = (request.form.get("usuario") or "").strip()
+        senha = (request.form.get("senha") or "").strip()
+       
+        if not usuario or not senha:
+            erro = "Usuário e senha são obrigatórios e não podem conter apenas espaços."
+        elif len(usuario) < 3 or len(usuario) > 40:
             erro = "Usuário inválido. O nome deve ter entre 3 e 40 caracteres."
-
-        elif senha and (len(senha) < 4 or len(senha) > 20):
+        elif len(senha) < 4 or len(senha) > 20:
             erro = "Senha inválida. A senha deve ter entre 4 e 20 caracteres."
         else:
-            for user in usuarios:
+            if autenticar_usuario(usuario, senha):
+                session["logado"] = True
+                session["usuario"] = usuario
+                return redirect(url_for("carros_page"))
+           
+            erro = "Usuário ou senha inválidos."
 
-                if (
-                    user["usuario"] == usuario
-                    and
-                    user["senha"] == senha
-                ):
-
-                    session["usuario"] = usuario
-
-                    return redirect(url_for("carros_page"))
-
-            erro = "Usuário ou senha inválidos"
-
-    return render_template(
-        "login.html",
-        erro=erro
-    )
-    
+    return render_template("login.html", erro=erro)
+   
+@app.route("/cadastro", methods=["GET", "POST"])
 @app.route("/cadastro", methods=["GET", "POST"])
 def cadastro():
+    if usuario_logado():
+        return redirect(url_for("carros_page"))
 
     erro = None
 
     if request.method == "POST":
+       
+        usuario = (request.form.get("usuario") or "").strip()
+        senha = (request.form.get("senha") or "").strip()
 
-        usuario = request.form.get("usuario")
-        senha = request.form.get("senha")
-
-        if usuario:
-            usuario = usuario.strip()
-        if senha:
-            senha = senha.strip()
-
-        if usuario and (len(usuario) < 3 or len(usuario) > 40):
+        if not usuario or not senha:
+            erro = "Usuário e senha são obrigatórios e não podem conter apenas espaços."
+            return render_template("cadastro.html", erro=erro)
+   
+        if len(usuario) < 3 or len(usuario) > 40:
             erro = "Usuário inválido. O nome deve ter entre 3 e 40 caracteres."
-            return render_template(
-                "cadastro.html",
-                erro=erro
-            )
-        
-        if senha and (len(senha) < 4 or len(senha) > 20):
+            return render_template("cadastro.html", erro=erro)
+       
+        if len(senha) < 4 or len(senha) > 20:
             erro = "Senha inválida. A senha deve ter entre 4 e 20 caracteres."
-            return render_template(
-                "cadastro.html",
-                erro=erro
-            )
+            return render_template("cadastro.html", erro=erro)
 
         for user in usuarios:
-
             if user["usuario"] == usuario:
-
                 erro = "Usuário já existe"
-
-                return render_template(
-                    "cadastro.html",
-                    erro=erro
-                )
+                return render_template("cadastro.html", erro=erro)
 
         usuarios.append({
             "usuario": usuario,
             "senha": senha
         })
-
-        salvar_json(
-            USUARIOS_FILE,
-            usuarios
-        )
-
+        salvar_json(USUARIOS_FILE, usuarios)
         return redirect(url_for("home"))
 
-    return render_template(
-        "cadastro.html",
-        erro=erro
-    )
+    return render_template("cadastro.html", erro=erro)
 
 @app.route("/carros", methods=["GET"])
 def carros_page():
@@ -218,25 +195,25 @@ def carros_page():
             carro for carro in carros_filtrados
             if carro["tipo_cambio"] == tipo_cambio
         ]
-    
+   
     if marca:
         carros_filtrados = [
             carro for carro in carros_filtrados
             if carro["marca"] == marca
         ]
-    
+   
     if tipo_combustivel:
         carros_filtrados = [
             carro for carro in carros_filtrados
             if carro["tipo_combustivel"] == tipo_combustivel
         ]
-    
+   
     if cor:
         carros_filtrados = [
             carro for carro in carros_filtrados
             if carro["cor"] == cor
         ]
-    
+   
     return render_template(
         "carros.html",
         anos = anos,
@@ -249,7 +226,10 @@ def carros_page():
 
 @app.route("/cadastrar", methods=["POST"])
 def cadastrar():
-    
+   
+    if not usuario_logado():
+        return redirect(url_for("login"))
+   
     modelo = request.form.get("modelo")
     ano = request.form.get("ano")
     preco = request.form.get("preco")
@@ -257,7 +237,6 @@ def cadastrar():
     tipo_cambio = request.form.get("tipo_cambio")
     marca = request.form.get("marca")
     tipo_combustivel = request.form.get("tipo_combustivel")
-
     erro_modelo = None
     erro_preco = None
 
@@ -265,7 +244,7 @@ def cadastrar():
         nome = modelo.strip()
         if len(nome) < 10 or len(nome) >= 100:
             erro_modelo = "Modelo inválido. Deve ter pelo entre 10 e 100 caracteres. Tente novamente!"
-            nome = None 
+            nome = None
 
     if preco:
         try:
@@ -293,7 +272,7 @@ def cadastrar():
             marca = "Não informada"
         if not tipo_combustivel:
             tipo_combustivel = "Não informado"
-            
+           
         carros.append({
             "id": gerar_id(),
             "modelo": modelo,
@@ -303,11 +282,11 @@ def cadastrar():
             "tipo_cambio": tipo_cambio,
             "marca": marca,
             "tipo_combustivel": tipo_combustivel,
-        }) 
+        })
 
         salvar_json(CARROS_FILE, carros)
         return redirect(url_for("carros_page"))
-    
+   
     return render_template(
         "carros.html",
         anos=anos,
@@ -318,7 +297,6 @@ def cadastrar():
         carros=carros,
         erro_modelo=erro_modelo,
         erro_preco=erro_preco,
-
         valor_modelo=modelo,
         valor_ano=ano,
         valor_preco=preco,
@@ -330,6 +308,10 @@ def cadastrar():
 
 @app.route("/deletar/<string:id>")
 def deletar(id):
+   
+    if not usuario_logado():
+        return redirect(url_for("login"))
+   
     carro = buscar_carro(id)
     if carro:
         carros.remove(carro)
@@ -360,10 +342,10 @@ def editar(id):
 
         if modelo:
             modelo = modelo.strip()
-        
+       
         if not modelo or len(modelo) < 10 or len(modelo) >= 100:
             erro_modelo = "Modelo inválido. Deve ter entre 10 e 100 caracteres. Tente novamente!"
-            modelo = None 
+            modelo = None
 
         if preco:
             try:
@@ -410,6 +392,9 @@ def editar(id):
 
 @app.route("/gerenciar")
 def gerenciar():
+   
+    if not usuario_logado():
+        return redirect(url_for("login"))
 
     return render_template(
         "gerenciar.html",
@@ -418,11 +403,12 @@ def gerenciar():
         marcas=marcas,
         combustiveis=combustiveis
     )
-    
+   
 @app.route("/logout")
 def logout():
 
-    session.clear()
+    session.pop("usuario", None)
+    session.pop("logado", None)
 
     return redirect(url_for("home"))
 
