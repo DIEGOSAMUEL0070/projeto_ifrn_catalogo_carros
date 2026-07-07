@@ -105,7 +105,6 @@ def home():
     return render_template("home.html")
    
 @app.route("/login", methods=["GET", "POST"])
-@app.route("/login", methods=["GET", "POST"])
 def login():
     if usuario_logado():
         return redirect(url_for("carros_page"))
@@ -132,7 +131,6 @@ def login():
 
     return render_template("login.html", erro=erro)
    
-@app.route("/cadastro", methods=["GET", "POST"])
 @app.route("/cadastro", methods=["GET", "POST"])
 def cadastro():
     if usuario_logado():
