@@ -8,6 +8,56 @@ import model
 
 app = Flask(__name__)
 
+model.criar_banco()
+model.criar_tabela()
+
+@app.route("/")
+def index():
+    carros = model.listar()
+    return render_template("carros.html", carros=carros)
+
+# @app.route("/novo")
+# def novo():
+#     return render_template("editar.html", carros=None) --- Não vai ser usado, pois é criado dentro de uma mesma página
+
+@app.route("/editar/<int:id>")
+def editar(id):
+    carro = model.buscar(id)
+    return render_template("editar.html", carro=carro)
+
+@app.route("/inserir", methods=["POST"])
+def inserir():
+    ano = request.form["ano"]
+    marca_id = request.form["marca_id"]
+    preco = request.form["preco"].strip()
+    tipo_cambio_id = request.form
+    tipo_combustivel_id = request.form["tipo_combustivel_id"]
+    cor_id = request.form["cor_id"]
+    modelo = request.form["modelo"].strip()
+    usuario_id = request.form["usuario_id"]
+
+    model.inserir(ano, marca_id, preco, tipo_cambio_id, tipo_combustivel_id, cor_id, modelo, usuario_id)
+    return redirect("/")
+
+@app.route("/atualizar/<int:id>", methods=["POST"])
+def atualizar(id):
+    ano = request.form["ano"]
+    marca_id = request.form["marca_id"]
+    preco = request.form["preco"].strip()
+    tipo_cambio_id = request.form
+    tipo_combustivel_id = request.form["tipo_combustivel_id"]
+    cor_id = request.form["cor_id"]
+    modelo = request.form["modelo"].strip()
+    usuario_id = request.form["usuario_id"]
+
+    model.atualizar(id, ano, marca_id, preco, tipo_cambio_id, tipo_combustivel_id, cor_id, modelo, usuario_id)
+    return redirect("/")
+
+@app.route("/excluir/<int:id>")
+def excluir(id):
+    model.excluir(id)
+    return redirect("/")
+
 app.secret_key = "fc_company"
 
 CARROS_FILE = "database/carros_cadastrados.json"
