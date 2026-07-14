@@ -10,6 +10,13 @@
 
 <body>
     <div class="container">
+
+        {% if session.get('usuario') %}
+        <div class="saudacao">
+            Olá, <strong>{{ session['usuario'] }}</strong>!
+        </div>
+        {% endif %}
+
         <div class="page_header">
             <div>
                 <h1>Sistema de Catálogo de Carros</h1>
@@ -46,7 +53,6 @@
                 
                     <select name="ano" title="Por favor, preencha o ano do carro" required>
                         <option value="">Ano de Fabricação</option>
-                
                         {% for c in anos %}
                         <option value="{{ c }}" {% if valor_ano==c %}selected{% endif %}>{{ c }}</option>
                         {% endfor %}
@@ -54,33 +60,29 @@
 
                     <select name="marca" title="Por favor, preencha a marca do carro" required>
                         <option value="">Marca</option>
-                
                         {% for c in marcas %}
-                        <option value="{{ c }}" {% if valor_marca==c %}selected{% endif %}>{{ c }}</option>
+                        <option value="{{ c.id }}" {% if valor_marca|string == c.id|string %}selected{% endif %}>{{ c.nome }}</option>
                         {% endfor %}
                     </select>
 
                     <select name="cor" title="Por favor, preencha a cor do carro" required>
                         <option value="">Cor do Carro</option>
-                
                         {% for c in cores %}
-                        <option value="{{ c }}" {% if valor_cor==c %}selected{% endif %}>{{ c }}</option>
+                        <option value="{{ c.id }}" {% if valor_cor|string == c.id|string %}selected{% endif %}>{{ c.nome }}</option>
                         {% endfor %}
                     </select>
 
                     <select name="tipo_cambio" title="Por favor, preencha o tipo de câmbio do carro" required>
                         <option value="">Tipo de Câmbio</option>
-                
                         {% for c in cambios %}
-                        <option value="{{ c }}" {% if valor_tipo_cambio==c %}selected{% endif %}>{{ c }}</option>
+                        <option value="{{ c.id }}" {% if valor_tipo_cambio|string == c.id|string %}selected{% endif %}>{{ c.nome }}</option>
                         {% endfor %}
                     </select>
 
                     <select name="tipo_combustivel" title="Por favor, preencha o tipo de combustível do carro" required>
                         <option value="">Combustíveis</option>
-            
                         {% for c in combustiveis %}
-                        <option value="{{ c }}" {% if valor_tipo_combustivel==c %}selected{% endif %}>{{ c }}</option>
+                        <option value="{{ c.id }}" {% if valor_tipo_combustivel|string == c.id|string %}selected{% endif %}>{{ c.nome }}</option>
                         {% endfor %}
                     </select>
 
@@ -98,7 +100,6 @@
                 <form method="GET" action="/carros" class="filtros_bar">
                     <select name="ano">
                         <option value="">Todos os Anos</option>
-    
                         {% for c in anos %}
                         <option value="{{ c }}" {% if request.args.get('ano')==c %}selected{% endif %}>
                             {{ c }}
@@ -108,40 +109,36 @@
                     
                     <select name="marca">
                         <option value="">Todas as Marcas</option>
-    
                         {% for c in marcas %}
-                        <option value="{{ c }}" {% if request.args.get('marca')==c %}selected{% endif %}>
-                            {{ c }}
+                        <option value="{{ c.id }}" {% if request.args.get('marca')|string == c.id|string %}selected{% endif %}>
+                            {{ c.nome }}
                         </option>
                         {% endfor %}
                     </select>
 
                     <select name="cor">
                         <option value="">Todas as Cores</option>
-    
                         {% for c in cores %}
-                        <option value="{{ c }}" {% if request.args.get('cor')==c %}selected{% endif %}>
-                            {{ c }}
+                        <option value="{{ c.id }}" {% if request.args.get('cor')|string == c.id|string %}selected{% endif %}>
+                            {{ c.nome }}
                         </option>
                         {% endfor %}
                     </select>
     
                     <select name="tipo_cambio">
                         <option value="">Todos os Câmbios</option>
-    
                         {% for c in cambios %}
-                        <option value="{{ c }}" {% if request.args.get('tipo_cambio')==c %}selected{% endif %}>
-                            {{ c }}
+                        <option value="{{ c.id }}" {% if request.args.get('tipo_cambio')|string == c.id|string %}selected{% endif %}>
+                            {{ c.nome }}
                         </option>
                         {% endfor %}
                     </select>
     
                     <select name="tipo_combustivel">
                         <option value="">Todos os Combustíveis</option>
-    
                         {% for c in combustiveis %}
-                        <option value="{{ c }}" {% if request.args.get('tipo_combustivel')==c %}selected{% endif %}>
-                            {{ c }}
+                        <option value="{{ c.id }}" {% if request.args.get('tipo_combustivel')|string == c.id|string %}selected{% endif %}>
+                            {{ c.nome }}
                         </option>
                         {% endfor %}
                     </select>
@@ -149,8 +146,6 @@
                     <button type="submit">Filtrar</button>
                 </form>
             </div>
-
-
         </div>
 
         <div class="secao_titulo">
@@ -163,12 +158,14 @@
                 <div class="carro_card">
                     <div class="carro_card_header">
                         <div>
-                            <div class="carro_marca">{{ carro.marca }}</div>
+                            <div class="carro_marca">
+                                {% for m in marcas if m.id|string == carro.marca_id|string %}{{ m.nome }}{% else %}Não informada{% endfor %}
+                            </div>
                             <div class="carro_titulo">{{ carro.modelo }}</div>
                         </div>
                     </div>
 
-                    <div class="carro_preco">{{ carro.preco }}</div>
+                    <div class="carro_preco">R$ {{ carro.preco }}</div>
 
                     <div class="carro_specificacoes">
                         <div class="carro_info_item">
@@ -177,15 +174,22 @@
                         </div>
                         <div class="carro_info_item">
                             <div class="carro_info_categoria">Cor</div>
-                            <div class="carro_info_valor">{{ carro.cor }}</div>
+
+                            <div class="carro_info_valor">
+                                {% for c in cores if c.id|string == carro.cor_id|string %}{{ c.nome }}{% else %}Não informada{% endfor %}
+                            </div>
                         </div>
                         <div class="carro_info_item">
                             <div class="carro_info_categoria">Câmbio</div>
-                            <div class="carro_info_valor">{{ carro.tipo_cambio }}</div>
+                            <div class="carro_info_valor">
+                                {% for cam in cambios if cam.id|string == carro.tipo_cambio_id|string %}{{ cam.nome }}{% else %}Não informado{% endfor %}
+                            </div>
                         </div>
                         <div class="carro_info_item">
                             <div class="carro_info_categoria">Combustível</div>
-                            <div class="carro_info_valor">{{ carro.tipo_combustivel }}</div>
+                            <div class="carro_info_valor">
+                                {% for comb in combustiveis if comb.id|string == carro.tipo_combustivel_id|string %}{{ comb.nome }}{% else %}Não informado{% endfor %}
+                            </div>
                         </div>
                     </div>
 
@@ -195,13 +199,11 @@
                     </div>
                 </div>
             </li>
-
             {% else %}
             <li class="vazio_estado">Nenhum carro encontrado.</li>
             {% endfor %}
         </ul>
     </div>
-
 </body>
 
 </html>

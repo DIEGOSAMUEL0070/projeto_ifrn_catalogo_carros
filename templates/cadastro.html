@@ -14,6 +14,12 @@
 <body>
 
     <div class="home_container">
+        
+        {% if session.get('usuario') %}
+        <div class="saudacao">
+            Olá, <strong>{{ session['usuario'] }}</strong>!
+        </div>
+        {% endif %}
 
         <div class="home_card">
 

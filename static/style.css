@@ -2,6 +2,15 @@
     box-sizing: border-box;
 }
 
+.saudacao {
+    background-color: #f1f5f9; 
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    text-align: right; 
+    margin-bottom: 15px; 
+    font-family: sans-serif;
+}
+
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
 

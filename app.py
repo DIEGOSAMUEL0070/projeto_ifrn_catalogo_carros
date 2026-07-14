@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import uuid
 import json
+from datetime import datetime
 import os
-# import model (Para a conexão do BD posteriormente)
+import model
 
 app = Flask(__name__)
 
@@ -26,13 +27,15 @@ def carregar_json(arquivo):
 def salvar_json(arquivo, dados):
     with open(arquivo, "w", encoding="utf-8") as f:
         json.dump(dados, f, indent=4, ensure_ascii=False)
+        
+ano_atual = datetime.now().year
 
+anos = list(range(ano_atual, 1900, -1))
 carros = carregar_json(CARROS_FILE)
 cambios = carregar_json(CAMBIOS_FILE)
 marcas = carregar_json(MARCAS_FILE)
 combustiveis = carregar_json(TIPO_COMBUSTIVEL_FILE)
 cores = carregar_json(CORES_FILE)
-anos = carregar_json(ANOS_FILE)
 usuarios = carregar_json(USUARIOS_FILE)
 
 if not cambios:
@@ -174,42 +177,36 @@ def carros_page():
 
     if not usuario_logado():
         return redirect(url_for("login"))
-    ano = request.args.get("ano")
-    tipo_cambio = request.args.get("tipo_cambio")
-    marca = request.args.get("marca")
-    tipo_combustivel = request.args.get("tipo_combustivel")
-    cor = request.args.get("cor")
+    
+    cor_id = request.form.get("cor")
+    tipo_cambio_id = request.form.get("tipo_cambio")
+    marca_id = request.form.get("marca")
+    tipo_combustivel_id = request.form.get("tipo_combustivel")
 
     carros_filtrados = carros
 
-    if ano:
+    if tipo_cambio_id:
         carros_filtrados = [
             carro for carro in carros_filtrados
-            if carro["ano"] == ano
-        ]
-
-    if tipo_cambio:
-        carros_filtrados = [
-            carro for carro in carros_filtrados
-            if carro["tipo_cambio"] == tipo_cambio
+            if carro["tipo_cambio"] == tipo_cambio_id
         ]
    
-    if marca:
+    if marca_id:
         carros_filtrados = [
             carro for carro in carros_filtrados
-            if carro["marca"] == marca
+            if carro["marca"] == marca_id
         ]
    
-    if tipo_combustivel:
+    if tipo_combustivel_id:
         carros_filtrados = [
             carro for carro in carros_filtrados
-            if carro["tipo_combustivel"] == tipo_combustivel
+            if carro["tipo_combustivel"] == tipo_combustivel_id
         ]
    
-    if cor:
+    if cor_id:
         carros_filtrados = [
             carro for carro in carros_filtrados
-            if carro["cor"] == cor
+            if carro["cor"] == cor_id
         ]
    
     return render_template(
@@ -240,8 +237,8 @@ def cadastrar():
 
     if modelo:
         nome = modelo.strip()
-        if len(nome) < 10 or len(nome) >= 100:
-            erro_modelo = "Modelo inválido. Deve ter pelo entre 10 e 100 caracteres. Tente novamente!"
+        if len(nome) < 2 or len(nome) >= 100:
+            erro_modelo = "Modelo inválido. Deve ter pelo entre 2 e 100 caracteres. Tente novamente!"
             nome = None
 
     if preco:
@@ -262,24 +259,24 @@ def cadastrar():
     if modelo and preco:
         if not ano:
             ano = "Não informado"
-        if not cor:
-            cor = "Não informada"
-        if not tipo_cambio:
-            tipo_cambio = "Não informado"
-        if not marca:
-            marca = "Não informada"
-        if not tipo_combustivel:
-            tipo_combustivel = "Não informado"
+        if not cor_id:
+            cor_id = "Não informada"
+        if not tipo_cambio_id:
+            tipo_cambio_id = "Não informado"
+        if not marca_id:
+            marca_id = "Não informada"
+        if not tipo_combustivel_id:
+            tipo_combustivel_id = "Não informado"
            
         carros.append({
             "id": gerar_id(),
             "modelo": modelo,
-            "ano": ano,
+            "ano": ano if ano else "Não informado",
             "preco": preco,
-            "cor": cor,
-            "tipo_cambio": tipo_cambio,
-            "marca": marca,
-            "tipo_combustivel": tipo_combustivel,
+            "cor_id": int(cor_id) if cor_id else None,
+            "tipo_cambio_id": int(tipo_cambio_id) if tipo_cambio_id else None,
+            "marca_id": int(marca_id) if marca_id else None,
+            "tipo_combustivel_id": int(tipo_combustivel_id) if tipo_combustivel_id else None,
         })
 
         salvar_json(CARROS_FILE, carros)
@@ -341,8 +338,8 @@ def editar(id):
         if modelo:
             modelo = modelo.strip()
        
-        if not modelo or len(modelo) < 10 or len(modelo) >= 100:
-            erro_modelo = "Modelo inválido. Deve ter entre 10 e 100 caracteres. Tente novamente!"
+        if not modelo or len(modelo) < 2 or len(modelo) >= 100:
+            erro_modelo = "Modelo inválido. Deve ter entre 2 e 100 caracteres. Tente novamente!"
             modelo = None
 
         if preco:
@@ -365,12 +362,12 @@ def editar(id):
         if not erro_modelo and not erro_preco:
 
             carro["modelo"] = modelo
-            carro["ano"] = ano
+            carro["ano"] = ano if ano else "Não informado"
             carro["preco"] = preco
-            carro["cor"] = cor
-            carro["tipo_cambio"] = tipo_cambio
-            carro["marca"] = marca
-            carro["tipo_combustivel"] = tipo_combustivel
+            carro["cor_id"] = int(cor) if cor else None
+            carro["tipo_cambio_id"] = int(tipo_cambio) if tipo_cambio else None
+            carro["marca_id"] = int(marca) if marca else None
+            carro["tipo_combustivel_id"] = int(tipo_combustivel) if tipo_combustivel else None
 
             salvar_json(CARROS_FILE, carros)
 
@@ -401,14 +398,11 @@ def gerenciar():
         marcas=marcas,
         combustiveis=combustiveis
     )
-   
+
 @app.route("/logout")
 def logout():
-
     session.pop("usuario", None)
-    session.pop("logado", None)
-
-    return redirect(url_for("home"))
+    return redirect(url_for("index"))
 
 if __name__ == "__main__":
     app.run(debug=True)
