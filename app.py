@@ -3,6 +3,7 @@ import uuid
 import json
 from datetime import datetime
 import os
+import re
 import model
 
 app = Flask(__name__)
@@ -89,7 +90,7 @@ if not anos:
     salvar_json(ANOS_FILE, anos)
 
 def usuario_logado():
-    return session.get("logado", False)
+    return session.get("logado", False) and "email" in session
 
 def gerar_id():
     return str(uuid.uuid4())
@@ -97,9 +98,9 @@ def gerar_id():
 def buscar_carro(id):
     return next((carro for carro in carros if carro["id"] == id), None)
 
-def autenticar_usuario(usuario, senha):
+def autenticar_usuario(email, senha):
     for user in usuarios:
-        if user["usuario"] == usuario and user["senha"] == senha:
+        if user.get("email") == email and user.get("senha") == senha:
             return True
     return False
 
@@ -109,66 +110,94 @@ def home():
    
 @app.route("/login", methods=["GET", "POST"])
 def login():
+
+    def email_valido(email):
+        return re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email)
+
+    email = request.form.get("email", "")
+    senha = request.form.get("senha", "")
+    erro = None
+
+    if not email_valido(email):
+        erro = "Digite um e-mail válido."
+        
+    elif len(senha) < 4 or len(senha) > 20:
+        erro = "Senha inválida. A senha deve ter entre 4 e 20 caracteres."
+        
+    else:
+        if autenticar_usuario(email, senha):
+            session["logado"] = True
+            session["email"] = email
+            return redirect(url_for("carros_page"))
+        else:
+            erro = "Usuário ou senha incorretos."
+            
+    return render_template("login.html", erro=erro)@app.route("/login", methods=["GET", "POST"])
+
+def login():
     if usuario_logado():
         return redirect(url_for("carros_page"))
-   
+
+    def email_valido(email):
+        return re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email)
+
     erro = None
 
     if request.method == "POST":
-        usuario = (request.form.get("usuario") or "").strip()
-        senha = (request.form.get("senha") or "").strip()
-       
-        if not usuario or not senha:
-            erro = "Usuário e senha são obrigatórios e não podem conter apenas espaços."
-        elif len(usuario) < 3 or len(usuario) > 40:
-            erro = "Usuário inválido. O nome deve ter entre 3 e 40 caracteres."
+        email = request.form.get("email", "").strip()
+        senha = request.form.get("senha", "").strip()
+
+        if not email_valido(email):
+            erro = "Digite um e-mail válido."
         elif len(senha) < 4 or len(senha) > 20:
             erro = "Senha inválida. A senha deve ter entre 4 e 20 caracteres."
         else:
-            if autenticar_usuario(usuario, senha):
+            if autenticar_usuario(email, senha):
                 session["logado"] = True
-                session["usuario"] = usuario
+                session["email"] = email 
                 return redirect(url_for("carros_page"))
-           
-            erro = "Usuário ou senha inválidos."
+            else:
+                erro = "E-mail ou senha incorretos."
 
     return render_template("login.html", erro=erro)
-   
+
 @app.route("/cadastro", methods=["GET", "POST"])
 def cadastro():
     if usuario_logado():
         return redirect(url_for("carros_page"))
 
+    def email_valido(email):
+        return re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email)
+
     erro = None
 
     if request.method == "POST":
-       
-        usuario = (request.form.get("usuario") or "").strip()
+        email = (request.form.get("email") or "").strip()
         senha = (request.form.get("senha") or "").strip()
 
-        if not usuario or not senha:
-            erro = "Usuário e senha são obrigatórios e não podem conter apenas espaços."
+        if not email or not senha:
+            erro = "E-mail e senha são obrigatórios."
             return render_template("cadastro.html", erro=erro)
-   
-        if len(usuario) < 3 or len(usuario) > 40:
-            erro = "Usuário inválido. O nome deve ter entre 3 e 40 caracteres."
+
+        if not email_valido(email):
+            erro = "Digite um e-mail válido para o cadastro."
             return render_template("cadastro.html", erro=erro)
-       
+
         if len(senha) < 4 or len(senha) > 20:
             erro = "Senha inválida. A senha deve ter entre 4 e 20 caracteres."
             return render_template("cadastro.html", erro=erro)
 
         for user in usuarios:
-            if user["usuario"] == usuario:
-                erro = "Usuário já existe"
+            if user.get("email") == email:
+                erro = "Este e-mail já está cadastrado."
                 return render_template("cadastro.html", erro=erro)
 
         usuarios.append({
-            "usuario": usuario,
+            "email": email,
             "senha": senha
         })
         salvar_json(USUARIOS_FILE, usuarios)
-        return redirect(url_for("home"))
+        return redirect(url_for("login"))
 
     return render_template("cadastro.html", erro=erro)
 
@@ -401,8 +430,9 @@ def gerenciar():
 
 @app.route("/logout")
 def logout():
-    session.pop("usuario", None)
-    return redirect(url_for("index"))
+    session.pop("logado", None)
+    session.pop("email", None)
+    return redirect(url_for("home")) 
 
 if __name__ == "__main__":
     app.run(debug=True)
