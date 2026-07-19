@@ -7,58 +7,125 @@ import re
 import model
 
 app = Flask(__name__)
+app.secret_key = "fc_company"
 
 model.criar_banco()
 model.criar_tabela()
-
-@app.route("/")
-def index():
-    carros = model.listar()
-    return render_template("carros.html", carros=carros)
 
 # @app.route("/novo")
 # def novo():
 #     return render_template("editar.html", carros=None) --- Não vai ser usado, pois é criado dentro de uma mesma página
 
-@app.route("/editar/<int:id>")
-def editar(id):
+# model.criar_banco()
+# if model.banco_vazio():
+#     model.restaurar_backup("banco_dados_carro_bck.sql") --- Restauração do backup
+
+@app.route("/db")
+def index_db():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    carros = model.listar()
+    return render_template(
+        "carros.html", 
+        carros=carros,
+        marcas=model.listar_marcas(),
+        cores=model.listar_cores(),
+        cambios=model.listar_cambios(),
+        combustiveis=model.listar_combustiveis()
+    )
+
+@app.route("/db/editar/<str:id>")
+def editar_db(id):
+    if not usuario_logado():
+        return redirect(url_for("login"))
+    
     carro = model.buscar(id)
-    return render_template("editar.html", carro=carro)
+    return render_template(
+        "editar.html",
+        carro=carro,
+        marcas=model.listar_marcas(),
+        cores=model.listar_cores(),
+        cambios=model.listar_cambios(),
+        combustiveis=model.listar_combustiveis()
+    )
 
-@app.route("/inserir", methods=["POST"])
-def inserir():
-    ano = request.form["ano"]
-    marca_id = request.form["marca_id"]
-    preco = request.form["preco"].strip()
-    tipo_cambio_id = request.form
-    tipo_combustivel_id = request.form["tipo_combustivel_id"]
-    cor_id = request.form["cor_id"]
-    modelo = request.form["modelo"].strip()
-    usuario_id = request.form["usuario_id"]
+@app.route("/db/inserir", methods=["POST"])
+def inserir_db():
+    if not usuario_logado():
+        return redirect(url_for("login"))
 
-    model.inserir(ano, marca_id, preco, tipo_cambio_id, tipo_combustivel_id, cor_id, modelo, usuario_id)
-    return redirect("/")
+    modelo = request.form.get("modelo", "").strip()
+    ano = request.form.get("ano", "").strip()
+    preco = request.form.get("preco", "").strip()
+    marca_id = request.form.get("marca_id", "").strip()
+    cor_id = request.form.get("cor_id", "").strip()
+    tipo_cambio_id = request.form.get("tipo_cambio_id", "").strip()
+    tipo_combustivel_id = request.form.get("tipo_combustivel_id", "").strip()
+    usuario_id = session.get("usuario_id")
 
-@app.route("/atualizar/<int:id>", methods=["POST"])
-def atualizar(id):
-    ano = request.form["ano"]
-    marca_id = request.form["marca_id"]
-    preco = request.form["preco"].strip()
-    tipo_cambio_id = request.form
-    tipo_combustivel_id = request.form["tipo_combustivel_id"]
-    cor_id = request.form["cor_id"]
-    modelo = request.form["modelo"].strip()
-    usuario_id = request.form["usuario_id"]
+    campos_obrigatorios = {
+        "Modelo": modelo,
+        "Ano": ano,
+        "Preço": preco,
+        "Marca": marca_id,
+        "Cor": cor_id,
+        "Tipo de Câmbio": tipo_cambio_id,
+        "Tipo de Combustível": tipo_combustivel_id,
+    }
 
-    model.atualizar(id, ano, marca_id, preco, tipo_cambio_id, tipo_combustivel_id, cor_id, modelo, usuario_id)
-    return redirect("/")
+    campo_vazio = []
+    for nome, valor in campos_obrigatorios.items():
+        if not valor:
+            campo_vazio.append(nome)
+    
+    if campo_vazio:
+        return f"Campo(s) obrigatório(s) não preenchido(s): {', '.join(campo_vazio)}", 400
 
-@app.route("/excluir/<int:id>")
-def excluir(id):
+    model.inserir(str(uuid.uuid4()), modelo, ano, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id, usuario_id)
+    return redirect(url_for("index_db"))
+
+@app.route("/db/atualizar/<str:id>", methods=["POST"])
+def atualizar_db(id):
+    if not usuario_logado():
+        return redirect(url_for("login"))
+    
+    modelo = request.form.get("modelo", "").strip()
+    ano = request.form.get("ano", "").strip()
+    preco = request.form.get("preco", "").strip()
+    marca_id = request.form.get("marca_id", "").strip()
+    cor_id = request.form.get("cor_id", "").strip()
+    tipo_cambio_id = request.form.get("tipo_cambio_id", "").strip()
+    tipo_combustivel_id = request.form.get("tipo_combustivel_id", "").strip()
+
+    campos_obrigatorios = {
+        "Modelo": modelo,
+        "Ano": ano,
+        "Preço": preco,
+        "Marca": marca_id,
+        "Cor": cor_id,
+        "Tipo de Câmbio": tipo_cambio_id,
+        "Tipo de Combustível": tipo_combustivel_id,
+    }
+
+    campo_vazio = []
+    for nome, valor in campos_obrigatorios.items():
+        if not valor:
+            campo_vazio.append(nome)
+    
+    if campo_vazio:
+        return f"Campo(s) obrigatório(s) não preenchido(s): {', '.join(campo_vazio)}", 400
+
+    model.atualizar(id, modelo, ano, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id)
+    return redirect(url_for("index_db"))
+
+@app.route("/db/excluir/<str:id>")
+def excluir_db(id):
+    if not usuario_logado():
+        return redirect(url_for("login"))
+    
     model.excluir(id)
-    return redirect("/")
-
-app.secret_key = "fc_company"
+    return redirect(url_for("index_db"))
 
 CARROS_FILE = "database/carros_cadastrados.json"
 CAMBIOS_FILE = "database/cambio.json"
