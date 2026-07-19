@@ -1,8 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import uuid
-import json
-from datetime import datetime
-import os
 import re
 import model
 
@@ -12,252 +9,29 @@ app.secret_key = "fc_company"
 model.criar_banco()
 model.criar_tabela()
 
-# @app.route("/novo")
-# def novo():
-#     return render_template("editar.html", carros=None) --- Não vai ser usado, pois é criado dentro de uma mesma página
-
 # model.criar_banco()
 # if model.banco_vazio():
 #     model.restaurar_backup("banco_dados_carro_bck.sql") --- Restauração do backup
 
-@app.route("/db")
-def index_db():
-    if not usuario_logado():
-        return redirect(url_for("login"))
-
-    carros = model.listar()
-    return render_template(
-        "carros.html", 
-        carros=carros,
-        marcas=model.listar_marcas(),
-        cores=model.listar_cores(),
-        cambios=model.listar_cambios(),
-        combustiveis=model.listar_combustiveis()
-    )
-
-@app.route("/db/editar/<str:id>")
-def editar_db(id):
-    if not usuario_logado():
-        return redirect(url_for("login"))
-    
-    carro = model.buscar(id)
-    return render_template(
-        "editar.html",
-        carro=carro,
-        marcas=model.listar_marcas(),
-        cores=model.listar_cores(),
-        cambios=model.listar_cambios(),
-        combustiveis=model.listar_combustiveis()
-    )
-
-@app.route("/db/inserir", methods=["POST"])
-def inserir_db():
-    if not usuario_logado():
-        return redirect(url_for("login"))
-
-    modelo = request.form.get("modelo", "").strip()
-    ano = request.form.get("ano", "").strip()
-    preco = request.form.get("preco", "").strip()
-    marca_id = request.form.get("marca_id", "").strip()
-    cor_id = request.form.get("cor_id", "").strip()
-    tipo_cambio_id = request.form.get("tipo_cambio_id", "").strip()
-    tipo_combustivel_id = request.form.get("tipo_combustivel_id", "").strip()
-    usuario_id = session.get("usuario_id")
-
-    campos_obrigatorios = {
-        "Modelo": modelo,
-        "Ano": ano,
-        "Preço": preco,
-        "Marca": marca_id,
-        "Cor": cor_id,
-        "Tipo de Câmbio": tipo_cambio_id,
-        "Tipo de Combustível": tipo_combustivel_id,
-    }
-
-    campo_vazio = []
-    for nome, valor in campos_obrigatorios.items():
-        if not valor:
-            campo_vazio.append(nome)
-    
-    if campo_vazio:
-        return f"Campo(s) obrigatório(s) não preenchido(s): {', '.join(campo_vazio)}", 400
-
-    model.inserir(str(uuid.uuid4()), modelo, ano, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id, usuario_id)
-    return redirect(url_for("index_db"))
-
-@app.route("/db/atualizar/<str:id>", methods=["POST"])
-def atualizar_db(id):
-    if not usuario_logado():
-        return redirect(url_for("login"))
-    
-    modelo = request.form.get("modelo", "").strip()
-    ano = request.form.get("ano", "").strip()
-    preco = request.form.get("preco", "").strip()
-    marca_id = request.form.get("marca_id", "").strip()
-    cor_id = request.form.get("cor_id", "").strip()
-    tipo_cambio_id = request.form.get("tipo_cambio_id", "").strip()
-    tipo_combustivel_id = request.form.get("tipo_combustivel_id", "").strip()
-
-    campos_obrigatorios = {
-        "Modelo": modelo,
-        "Ano": ano,
-        "Preço": preco,
-        "Marca": marca_id,
-        "Cor": cor_id,
-        "Tipo de Câmbio": tipo_cambio_id,
-        "Tipo de Combustível": tipo_combustivel_id,
-    }
-
-    campo_vazio = []
-    for nome, valor in campos_obrigatorios.items():
-        if not valor:
-            campo_vazio.append(nome)
-    
-    if campo_vazio:
-        return f"Campo(s) obrigatório(s) não preenchido(s): {', '.join(campo_vazio)}", 400
-
-    model.atualizar(id, modelo, ano, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id)
-    return redirect(url_for("index_db"))
-
-@app.route("/db/excluir/<str:id>")
-def excluir_db(id):
-    if not usuario_logado():
-        return redirect(url_for("login"))
-    
-    model.excluir(id)
-    return redirect(url_for("index_db"))
-
-CARROS_FILE = "database/carros_cadastrados.json"
-CAMBIOS_FILE = "database/cambio.json"
-MARCAS_FILE = "database/marca.json"
-TIPO_COMBUSTIVEL_FILE = "database/tipo_combustivel.json"
-CORES_FILE = "database/cor.json"
-ANOS_FILE = "database/anos.json"
-USUARIOS_FILE = "database/usuarios.json"
-
-def carregar_json(arquivo):
-    if not os.path.exists(arquivo):
-        return []
-   
-    with open(arquivo, "r", encoding="utf-8") as f:
-        return json.load(f)
-   
-def salvar_json(arquivo, dados):
-    with open(arquivo, "w", encoding="utf-8") as f:
-        json.dump(dados, f, indent=4, ensure_ascii=False)
-        
-ano_atual = datetime.now().year
-
-anos = list(range(ano_atual, 1900, -1))
-carros = carregar_json(CARROS_FILE)
-cambios = carregar_json(CAMBIOS_FILE)
-marcas = carregar_json(MARCAS_FILE)
-combustiveis = carregar_json(TIPO_COMBUSTIVEL_FILE)
-cores = carregar_json(CORES_FILE)
-usuarios = carregar_json(USUARIOS_FILE)
-
-if not cambios:
-    cambios = [
-        "Automático",
-        "Manual"
-    ]
-
-    salvar_json(CAMBIOS_FILE, cambios)
-
-if not marcas:
-    marcas = [
-        "Chevrolet",
-        "Fiat",
-        "Ford",
-        "Hyundai",
-        "Toyota",
-        "Volkswagen",
-        "Ferrari"
-    ]
-
-    salvar_json(MARCAS_FILE, marcas)
-
-if not combustiveis:
-    combustiveis = [
-        "Gasolina",
-        "Etanol",
-        "Diesel",
-        "Híbrido",
-        "Elétrico"
-    ]
-
-    salvar_json(TIPO_COMBUSTIVEL_FILE, combustiveis)
-
-if not cores:
-    cores = [
-        "Branco",
-        "Preto",
-        "Prata",
-        "Cinza",
-        "Vermelho"
-    ]
-
-    salvar_json(CORES_FILE, cores)
-
-if not anos:
-    anos = [
-        str(ano) for ano in range(2001, 2020)
-    ]
-
-    salvar_json(ANOS_FILE, anos)
-
 def usuario_logado():
-    return session.get("logado", False) and "email" in session
+    return session.get("logado", False) and "usuario_id" in session
 
 def gerar_id():
     return str(uuid.uuid4())
 
-def buscar_carro(id):
-    return next((carro for carro in carros if carro["id"] == id), None)
-
-def autenticar_usuario(email, senha):
-    for user in usuarios:
-        if user.get("email") == email and user.get("senha") == senha:
-            return True
-    return False
+def email_valido(email):
+    return re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email)
 
 @app.route("/")
 def home():
     return render_template("home.html")
-   
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
-    def email_valido(email):
-        return re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email)
-
-    email = request.form.get("email", "")
-    senha = request.form.get("senha", "")
-    erro = None
-
-    if not email_valido(email):
-        erro = "Digite um e-mail válido."
-        
-    elif len(senha) < 4 or len(senha) > 20:
-        erro = "Senha inválida. A senha deve ter entre 4 e 20 caracteres."
-        
-    else:
-        if autenticar_usuario(email, senha):
-            session["logado"] = True
-            session["email"] = email
-            return redirect(url_for("carros_page"))
-        else:
-            erro = "Usuário ou senha incorretos."
-            
-    return render_template("login.html", erro=erro)@app.route("/login", methods=["GET", "POST"])
-
-def login():
     if usuario_logado():
         return redirect(url_for("carros_page"))
-
-    def email_valido(email):
-        return re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email)
-
+    
     erro = None
 
     if request.method == "POST":
@@ -265,35 +39,36 @@ def login():
         senha = request.form.get("senha", "").strip()
 
         if not email_valido(email):
-            erro = "Digite um e-mail válido."
+            erro = "Digite um e-mail válido."        
         elif len(senha) < 4 or len(senha) > 20:
             erro = "Senha inválida. A senha deve ter entre 4 e 20 caracteres."
         else:
-            if autenticar_usuario(email, senha):
+            usuario = model.buscar_usuario_por_login(email, senha)  
+
+            if usuario:
                 session["logado"] = True
-                session["email"] = email 
+                session["usuario_id"] = usuario["id"]
+                session["nome"] = usuario["nome"]
                 return redirect(url_for("carros_page"))
             else:
-                erro = "E-mail ou senha incorretos."
-
+                erro = "E-mail ou senha incorretos."             
     return render_template("login.html", erro=erro)
 
 @app.route("/cadastro", methods=["GET", "POST"])
 def cadastro():
+    
     if usuario_logado():
         return redirect(url_for("carros_page"))
-
-    def email_valido(email):
-        return re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email)
 
     erro = None
 
     if request.method == "POST":
-        email = (request.form.get("email") or "").strip()
-        senha = (request.form.get("senha") or "").strip()
+        nome =  request.form.get("nome", "").strip()
+        email = request.form.get("email", "").strip()
+        senha = request.form.get("senha", "").strip()
 
-        if not email or not senha:
-            erro = "E-mail e senha são obrigatórios."
+        if not nome or not email or not senha:
+            erro = "Nome, e-mail e senha são obrigatórios."
             return render_template("cadastro.html", erro=erro)
 
         if not email_valido(email):
@@ -304,65 +79,42 @@ def cadastro():
             erro = "Senha inválida. A senha deve ter entre 4 e 20 caracteres."
             return render_template("cadastro.html", erro=erro)
 
-        for user in usuarios:
-            if user.get("email") == email:
-                erro = "Este e-mail já está cadastrado."
-                return render_template("cadastro.html", erro=erro)
-
-        usuarios.append({
-            "email": email,
-            "senha": senha
-        })
-        salvar_json(USUARIOS_FILE, usuarios)
+        if model.buscar_usuario_por_email(email):
+            erro = "Este e-mail já está cadastrado."
+            return render_template("cadastro.html", erro=erro)
+        
+        model.inserir_usuario(email, senha, nome)
         return redirect(url_for("login"))
 
     return render_template("cadastro.html", erro=erro)
 
-@app.route("/carros", methods=["GET"])
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("home")) 
+
+@app.route("/carros", methods=["GET", "POST"])
 def carros_page():
 
     if not usuario_logado():
         return redirect(url_for("login"))
     
+    ano_id = request.form.get("ano")
+    marca_id = request.form.get("marca")
     cor_id = request.form.get("cor")
     tipo_cambio_id = request.form.get("tipo_cambio")
-    marca_id = request.form.get("marca")
     tipo_combustivel_id = request.form.get("tipo_combustivel")
 
-    carros_filtrados = carros
-
-    if tipo_cambio_id:
-        carros_filtrados = [
-            carro for carro in carros_filtrados
-            if carro["tipo_cambio"] == tipo_cambio_id
-        ]
-   
-    if marca_id:
-        carros_filtrados = [
-            carro for carro in carros_filtrados
-            if carro["marca"] == marca_id
-        ]
-   
-    if tipo_combustivel_id:
-        carros_filtrados = [
-            carro for carro in carros_filtrados
-            if carro["tipo_combustivel"] == tipo_combustivel_id
-        ]
-   
-    if cor_id:
-        carros_filtrados = [
-            carro for carro in carros_filtrados
-            if carro["cor"] == cor_id
-        ]
+    carros = model.listar(ano_id, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id)
    
     return render_template(
         "carros.html",
-        anos = anos,
-        cores = cores,
-        carros = carros_filtrados,
-        cambios = cambios,
-        marcas = marcas,
-        combustiveis = combustiveis
+        carros = carros,
+        anos = model.listar_anos(),
+        marcas = model.listar_marcas(),
+        cores = model.listar_cores(),
+        cambios = model.listar_cambios(),
+        combustiveis = model.listar_combustiveis()
     )
 
 @app.route("/cadastrar", methods=["POST"])
@@ -371,165 +123,184 @@ def cadastrar():
     if not usuario_logado():
         return redirect(url_for("login"))
    
-    modelo = request.form.get("modelo")
-    ano = request.form.get("ano")
+    modelo = request.form.get("modelo", "").strip()
+    ano_id = request.form.get("ano")
     preco = request.form.get("preco")
-    cor = request.form.get("cor")
-    tipo_cambio = request.form.get("tipo_cambio")
-    marca = request.form.get("marca")
-    tipo_combustivel = request.form.get("tipo_combustivel")
+    marca_id = request.form.get("marca")
+    cor_id = request.form.get("cor")
+    tipo_cambio_id = request.form.get("tipo_cambio")
+    tipo_combustivel_id = request.form.get("tipo_combustivel")
+
     erro_modelo = None
     erro_preco = None
+    erro_ano = None
+    erro_marca = None
+    erro_cor = None
+    erro_tipo_cambio = None
+    erro_tipo_combustivel = None
 
-    if modelo:
-        nome = modelo.strip()
-        if len(nome) < 2 or len(nome) >= 100:
-            erro_modelo = "Modelo inválido. Deve ter pelo entre 2 e 100 caracteres. Tente novamente!"
-            nome = None
+    if not modelo or len(modelo) < 2 or len(modelo) >= 100:
+        erro_modelo = "Modelo inválido. Deve ter pelo entre 2 e 100 caracteres. Tente novamente!"
 
-    if preco:
+    if not preco:
+        erro_preco = "O preço é um campo obrigatório."
+    else:
         try:
             preco_digitado = float(preco)
             if preco_digitado <= 5000:
-                erro_preco = "O preço digitado é inválido. O valor mínimo é de R$ 5.000,00."
-                preco = None
+                erro_preco = "O preço digitado é inválido. O valor mínimo é de R$ 5.000,00"
 
             elif preco_digitado > 1000000:
                 erro_preco = "O preço digitado é inválido. O valor máximo é de R$ 1.000.000,00"
-                preco = None
 
         except ValueError:
             erro_preco = "O valor digitado é inválido. O preço deve ser um número. Tente novamente!"
-            preco = None
 
-    if modelo and preco:
-        if not ano:
-            ano = "Não informado"
-        if not cor_id:
-            cor_id = "Não informada"
-        if not tipo_cambio_id:
-            tipo_cambio_id = "Não informado"
-        if not marca_id:
-            marca_id = "Não informada"
-        if not tipo_combustivel_id:
-            tipo_combustivel_id = "Não informado"
-           
-        carros.append({
-            "id": gerar_id(),
-            "modelo": modelo,
-            "ano": ano if ano else "Não informado",
-            "preco": preco,
-            "cor_id": int(cor_id) if cor_id else None,
-            "tipo_cambio_id": int(tipo_cambio_id) if tipo_cambio_id else None,
-            "marca_id": int(marca_id) if marca_id else None,
-            "tipo_combustivel_id": int(tipo_combustivel_id) if tipo_combustivel_id else None,
-        })
+    if not ano_id:
+        erro_ano = "O ano de fabricação é obrigatório"
+    if not marca_id:
+        erro_marca = "A marca é obrigatória"
+    if not cor_id:
+        erro_cor = "A cor do carro é obrigatória"
+    if not tipo_cambio_id:
+        erro_tipo_cambio = "O tipo de câmbio é obrigatório"
+    if not tipo_combustivel_id:
+        erro_tipo_combustivel = "O tipo de combustível é obrigatório"
+    
+    sem_erros = not any(
+        [
+            erro_modelo, erro_preco, erro_ano, erro_marca, erro_cor, erro_tipo_cambio, erro_tipo_combustivel
+        ]
+    )
 
-        salvar_json(CARROS_FILE, carros)
+    if sem_erros:
+        model.inserir(
+            gerar_id(), modelo, ano_id, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id, session["usuario_id"]
+        )
         return redirect(url_for("carros_page"))
    
     return render_template(
         "carros.html",
-        anos=anos,
-        cores=cores,
-        cambios=cambios,
-        marcas=marcas,
-        combustiveis=combustiveis,
-        carros=carros,
+        carros = model.listar(), 
+        anos = model.listar_anos(),
+        marcas = model.listar_marcas(),
+        cores = model.listar_cores(),
+        cambios = model.listar_cambios(),
+        combustiveis = model.listar_combustiveis(),
+
         erro_modelo=erro_modelo,
         erro_preco=erro_preco,
+        erro_ano=erro_ano,
+        erro_marca=erro_marca,
+        erro_cor=erro_cor,
+        erro_tipo_cambio=erro_tipo_cambio,
+        erro_tipo_combustivel=erro_tipo_combustivel,
+
         valor_modelo=modelo,
-        valor_ano=ano,
+        valor_ano=ano_id,
         valor_preco=preco,
-        valor_cor=cor,
-        valor_tipo_cambio=tipo_cambio,
-        valor_marca=marca,
-        valor_tipo_combustivel=tipo_combustivel
+        valor_marca=marca_id,
+        valor_cor=cor_id,
+        valor_tipo_cambio=tipo_cambio_id,
+        valor_tipo_combustivel=tipo_combustivel_id
     )
-
-@app.route("/deletar/<string:id>")
-def deletar(id):
-   
-    if not usuario_logado():
-        return redirect(url_for("login"))
-   
-    carro = buscar_carro(id)
-    if carro:
-        carros.remove(carro)
-
-        salvar_json(CARROS_FILE, carros)
-    return redirect(url_for("carros_page"))
 
 @app.route("/editar/<string:id>", methods=["GET", "POST"])
 def editar(id):
 
-    carro = buscar_carro(id)
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    carro = model.buscar(id)
 
     if not carro:
         return redirect(url_for("carros_page"))
 
     erro_modelo = None
     erro_preco = None
+    erro_ano = None
+    erro_marca = None
+    erro_cor = None
+    erro_tipo_cambio = None
+    erro_tipo_combustivel = None
 
     if request.method == "POST":
 
-        modelo = request.form.get("modelo")
-        ano = request.form.get("ano")
+        modelo = request.form.get("modelo", "").strip()
+        ano_id = request.form.get("ano")
         preco = request.form.get("preco")
-        cor = request.form.get("cor")
-        tipo_cambio = request.form.get("tipo_cambio")
-        marca = request.form.get("marca")
-        tipo_combustivel = request.form.get("tipo_combustivel")
-
-        if modelo:
-            modelo = modelo.strip()
+        marca_id = request.form.get("marca")
+        cor_id = request.form.get("cor")
+        tipo_cambio_id = request.form.get("tipo_cambio")
+        tipo_combustivel_id = request.form.get("tipo_combustivel")
        
         if not modelo or len(modelo) < 2 or len(modelo) >= 100:
             erro_modelo = "Modelo inválido. Deve ter entre 2 e 100 caracteres. Tente novamente!"
-            modelo = None
 
-        if preco:
+        if not preco:
+            erro_preco = "O preço é obrigatório"
+        else:
             try:
                 preco_digitado = float(preco)
                 if preco_digitado <= 5000:
                     erro_preco = "O preço digitado é inválido. O valor mínimo é de R$ 5.000,00."
-                    preco = None
 
                 elif preco_digitado > 1000000:
                     erro_preco = "O preço digitado é inválido. O valor máximo é de R$ 1.000.000,00"
-                    preco = None
 
             except ValueError:
                 erro_preco = "O valor digitado é inválido. O preço deve ser um número. Tente novamente!"
-                preco = None
-        else:
-            erro_preco = "O Preço é obrigatório."
+            
+        if not ano_id:
+            erro_ano = "O ano de fabricação é obrigatório"
+        if not marca_id:
+            erro_marca = "A marca é obrigatória"
+        if not cor_id:
+            erro_cor = "A cor do carro é obrigatória"
+        if not tipo_cambio_id:
+            erro_tipo_cambio = "O tipo de câmbio é obrigatório"
+        if not tipo_combustivel_id:
+            erro_tipo_combustivel = "O tipo de combustível é obrigatório"
+        
+        sem_erros = not any(
+            [
+                erro_modelo, erro_preco, erro_ano, erro_marca, erro_cor, erro_tipo_cambio, erro_tipo_combustivel
+            ]
+        )
 
-        if not erro_modelo and not erro_preco:
-
-            carro["modelo"] = modelo
-            carro["ano"] = ano if ano else "Não informado"
-            carro["preco"] = preco
-            carro["cor_id"] = int(cor) if cor else None
-            carro["tipo_cambio_id"] = int(tipo_cambio) if tipo_cambio else None
-            carro["marca_id"] = int(marca) if marca else None
-            carro["tipo_combustivel_id"] = int(tipo_combustivel) if tipo_combustivel else None
-
-            salvar_json(CARROS_FILE, carros)
-
+        if sem_erros:
+            model.atualizar(
+                id, modelo, ano_id, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id
+            )
             return redirect(url_for("carros_page"))
 
     return render_template(
         "editar.html",
-        carro=carro,
-        anos=anos,
-        cores=cores,
-        cambios=cambios,
-        marcas=marcas,
-        combustiveis=combustiveis,
-        erro_modelo=erro_modelo,
-        erro_preco=erro_preco
+        carro = carro,
+        anos = model.listar_anos(),
+        marcas = model.listar_marcas(),
+        cores = model.listar_cores(),
+        cambios = model.listar_cambios(),
+        combustiveis = model.listar_combustiveis(),
+
+        erro_modelo = erro_modelo,
+        erro_preco = erro_preco,
+        erro_ano = erro_ano,
+        erro_marca = erro_marca,
+        erro_cor = erro_cor,
+        erro_tipo_cambio = erro_tipo_cambio,
+        erro_tipo_combustivel = erro_tipo_combustivel
     )
+
+@app.route("/excluir/<string:id>")
+def deletar(id):
+
+    if not usuario_logado():
+        return redirect(url_for("login"))
+    
+    model.excluir(id)
+    return redirect(url_for("carros_page"))
+
 
 @app.route("/gerenciar")
 def gerenciar():
@@ -539,17 +310,12 @@ def gerenciar():
 
     return render_template(
         "gerenciar.html",
-        cores=cores,
-        cambios=cambios,
-        marcas=marcas,
-        combustiveis=combustiveis
+        anos = model.listar_anos(),
+        cores = model.listar_cores(),
+        cambios = model.listar_cambios(),
+        marcas = model.listar_marcas(),
+        combustiveis = model.listar_combustiveis()
     )
-
-@app.route("/logout")
-def logout():
-    session.pop("logado", None)
-    session.pop("email", None)
-    return redirect(url_for("home")) 
 
 if __name__ == "__main__":
     app.run(debug=True)

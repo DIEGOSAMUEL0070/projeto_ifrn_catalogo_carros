@@ -3,6 +3,7 @@ import subprocess
 import psycopg2
 import psycopg2.extras
 from psycopg2 import sql
+from datetime import datetime
 
 HOST = "localhost"
 PORT = "5432"
@@ -54,6 +55,13 @@ def criar_tabela():
     cur = conn.cursor()
 
     cur.execute("""
+        CREATE TABLE IF NOT EXISTS anos (
+            id SERIAL PRIMARY KEY,
+            ano INTEGER NOT NULL UNIQUE
+        );
+    """) 
+
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS marcas (
             id SERIAL PRIMARY KEY, 
             nome VARCHAR(100) NOT NULL UNIQUE
@@ -94,14 +102,15 @@ def criar_tabela():
         CREATE TABLE IF NOT EXISTS carros (
             id VARCHAR(36) PRIMARY KEY,
             modelo VARCHAR(100) NOT NULL,
-            ano VARCHAR(15) DEFAULT 'Não informado',
+            ano_id INTEGER,
             preco DECIMAL(10, 2) NOT NULL,
             marca_id INTEGER,
             cor_id INTEGER,
             tipo_cambio_id INTEGER,
             tipo_combustivel_id INTEGER,
             usuario_id INTEGER,
-
+            
+            FOREIGN KEY (ano_id) REFERENCES anos(id) ON DELETE SET NULL,
             FOREIGN KEY (marca_id) REFERENCES marcas(id) ON DELETE SET NULL,
             FOREIGN KEY (cor_id) REFERENCES cores(id) ON DELETE SET NULL,
             FOREIGN KEY (tipo_cambio_id) REFERENCES cambios(id) ON DELETE SET NULL,
@@ -111,6 +120,14 @@ def criar_tabela():
     """)
 
     conn.commit()
+
+    ano_atual = datetime.now().year
+    anos_para_inserir = [(ano,) for ano in range(2001, ano_atual+1)]
+
+    cur.executemany(
+        "INSERT INTO anos (ano) VALUES (%s) ON CONFLICT (ano) DO NOTHING",
+        anos_para_inserir
+    )
 
     cur.execute("SELECT COUNT(*) FROM marcas")
     if cur.fetchone()[0] == 0:
@@ -211,6 +228,15 @@ def banco_vazio():
 
     return not existe
 
+def listar_anos():
+    conn = get_conn()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("SELECT * FROM anos ORDER BY id")
+    anos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return anos
+
 def listar_marcas():
     conn = get_conn()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -247,13 +273,16 @@ def listar_combustiveis():
     conn.close()
     return combustiveis
 
-def listar(marca_id=None, cor_id=None, tipo_cambio_id=None, tipo_combustivel_id=None):
+def listar(ano_id=None, marca_id=None, cor_id=None, tipo_cambio_id=None, tipo_combustivel_id=None):
     conn = get_conn()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     query = "SELECT * FROM carros WHERE TRUE"
     valores = []
 
+    if ano_id:
+        query += " AND ano_id = %s"
+        valores.append(ano_id)
     if marca_id:
         query += " AND marca_id = %s"
         valores.append(marca_id)
@@ -283,26 +312,26 @@ def buscar(id):
     conn.close()
     return carro
 
-def inserir(id, modelo, ano, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id, usuario_id):
+def inserir(id, modelo, ano_id, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id, usuario_id):
     conn = get_conn()
     cur = conn.cursor()
     cur.execute(
-        """INSERT INTO carros (id, modelo, ano, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id, usuario_id) 
+        """INSERT INTO carros (id, modelo, ano_id, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id, usuario_id) 
            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-        (id, modelo, ano, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id, usuario_id)
+        (id, modelo, ano_id, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id, usuario_id)
     )
     conn.commit()
     cur.close()
     conn.close()
 
-def atualizar(id, modelo, ano, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id):
+def atualizar(id, modelo, ano_id, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id):
     conn = get_conn()
     cur = conn.cursor()
     cur.execute(
-        """UPDATE carros SET modelo = %s, ano = %s, preco = %s, marca_id = %s,
+        """UPDATE carros SET modelo = %s, ano_id = %s, preco = %s, marca_id = %s,
             cor_id = %s, tipo_cambio_id = %s, tipo_combustivel_id = %s 
         WHERE id = %s""",
-        (modelo, ano, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id, id)
+        (modelo, ano_id, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id, id)
     )
     conn.commit()
     cur.close()
