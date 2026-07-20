@@ -56,7 +56,7 @@
                             <option value="">Ano de Fabricação</option>
                             {% for c in anos %}
                             <option value="{{ c.id }}" {% if valor_ano==c.id %}selected{% endif %}>{{ c.ano }}</option>
-                            {% endfor % }
+                            {% endfor %}
                         </select>
                         {% if erro_ano %}
                         <span class="erro_texto">{{ erro_ano }}</span>
