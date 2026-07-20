@@ -5,13 +5,13 @@ import model
 
 app = Flask(__name__)
 app.secret_key = "fc_company"
-
+    
 model.criar_banco()
 model.criar_tabela()
 
 # model.criar_banco()
 # if model.banco_vazio():
-#     model.restaurar_backup("banco_dados_carro_bck.sql") --- Restauração do backup
+#     model.restaurar_backup("banco_dados_carro_bck.sql") --- Restauração pelo backup
 
 def usuario_logado():
     return session.get("logado", False) and "usuario_id" in session
@@ -99,11 +99,11 @@ def carros_page():
     if not usuario_logado():
         return redirect(url_for("login"))
     
-    ano_id = request.form.get("ano")
-    marca_id = request.form.get("marca")
-    cor_id = request.form.get("cor")
-    tipo_cambio_id = request.form.get("tipo_cambio")
-    tipo_combustivel_id = request.form.get("tipo_combustivel")
+    ano_id = request.args.get("ano")
+    marca_id = request.args.get("marca")
+    cor_id = request.args.get("cor")
+    tipo_cambio_id = request.args.get("tipo_cambio")
+    tipo_combustivel_id = request.args.get("tipo_combustivel")
 
     carros = model.listar(ano_id, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id)
    

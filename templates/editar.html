@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
@@ -46,9 +46,9 @@
                     <select name="ano" title="Por favor, preencha o ano do carro" required>
                         <option value="">Selecione um Ano</option>
     
-                        {% for a in anos %}
-                        <option value="{{ a.id }}" {% if carro.ano_id|string==a.id|string %}selected{% endif %}>
-                            {{ a.ano }}
+                        {% for c in anos %}
+                        <option value="{{ c.id }}" {% if carro.ano_id|string==c.id|string %}selected{% endif %}>
+                            {{ c.ano }}
                         </option>
                         {% endfor %}
                     </select>

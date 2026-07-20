@@ -119,8 +119,6 @@ def criar_tabela():
         );
     """)
 
-    conn.commit()
-
     ano_atual = datetime.now().year
     anos_para_inserir = [(ano,) for ano in range(2001, ano_atual+1)]
 
