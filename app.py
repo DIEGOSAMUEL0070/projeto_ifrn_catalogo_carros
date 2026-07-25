@@ -52,7 +52,11 @@ def login():
                 return redirect(url_for("carros_page"))
             else:
                 erro = "E-mail ou senha incorretos."             
-    return render_template("login.html", erro=erro)
+    return render_template(
+        "login.html",
+        erro=erro,
+        valor_email=email
+    )
 
 @app.route("/cadastro", methods=["GET", "POST"])
 def cadastro():
@@ -69,7 +73,12 @@ def cadastro():
 
         if not nome or not email or not senha:
             erro = "Nome, e-mail e senha são obrigatórios."
-            return render_template("cadastro.html", erro=erro)
+            return render_template(
+                "cadastro.html", 
+                erro=erro,
+                valor_nome=nome,
+                valor_email=email
+            )
 
         if not email_valido(email):
             erro = "Digite um e-mail válido para o cadastro."

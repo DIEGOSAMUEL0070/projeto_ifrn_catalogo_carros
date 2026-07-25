@@ -13,20 +13,26 @@
 
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+}
 
+body.home_background {
     background-image: url("fundo.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    min-height: 100vh;
-    margin: 0;
+}
+
+body.app_background {
+    background-color: #eef3f8;
 }
 
 .container {
     max-width: 1000px;
     margin: 40px auto;
-    background: rgba(255,255,255,0.85);
+    background: #ffffffd9;
     padding: 30px;
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
@@ -430,4 +436,24 @@ li {
     color: #888888;
     background: #ffffff99;
     border-radius: 12px;
+}
+
+.senha {
+    position: relative;
+}
+
+.senha input {
+    width: 100%;
+    padding-right: 45px;
+}
+
+.senha button {
+    position: absolute;
+    right: 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+    margin: 0;
 }

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
-<body>
+<body class="home_background">
     <div class="home_container">
 
         <div class="home_card">
@@ -19,15 +19,20 @@
 
             <form method="POST">
                 <div class="input_group">
-                    <input type="text" name="nome" placeholder="Digite seu nome" required>
+                    <input type="text" name="nome" value="{{ valor_nome if valor_nome else '' }}" placeholder="Digite seu nome" required>
                 </div>
 
                 <div class="input_group">
-                    <input type="email" name="email" placeholder="Digite seu e-mail mais importante" required>
+                    <input type="email" name="email" value="{{ valor_email if valor_email else '' }}" placeholder="Digite seu e-mail mais importante" required>
                 </div>
 
                 <div class="input_group">
-                    <input type="password" name="senha" placeholder="Senha" required>
+                    <div class="senha">
+                        <input type="password" id="senha" name="senha" placeholder="Senha" required>
+                        <button type="button" onclick="mostrarSenha()">
+                            👁
+                        </button>
+                    </div>
                 </div>
 
                 {% if erro %}
@@ -42,6 +47,18 @@
             </form>
         </div>
     </div>
+
+    <script>
+        function mostrarSenha() {
+            const senha = document.getElementById("senha");
+
+            if (senha.type === "password") {
+                senha.type = "text";
+            } else {
+                senha.type = "password";
+            }
+        }
+    </script>    
 </body>
 
 </html>
