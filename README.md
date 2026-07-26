@@ -46,6 +46,8 @@ Além disso, possui um sistema de login e cadastro de usuários.
 │ ├── cadastro.html
 │ ├── carros.html
 │ ├── gerenciar.html
+│ ├── header.html
+│ ├── cadastrar_carro.html
 │ └── editar.html
 │
 ├── static/
