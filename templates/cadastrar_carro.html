@@ -4,26 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar</title>
+    <title>Cadastrar Carro</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body class="app_background">
     {% include 'header.html' %}
-    
+
     <div class="container">
         <div class="page_header">
             <div>
-                <h1>Editar Informações do Carro</h1>
+                <h1>Cadastrar Novo Carro</h1>
             </div>
         </div>
 
         <div class="cadastro_card">
-            <form method="POST">
+            <form method="POST" action="/cadastrar">
+
                 <div class="input_group">
                     <label for="modelo">Modelo:</label>
-                    <input id="modelo" name="modelo" value="{{ carro.modelo }}" placeholder="Modelo do carro" required>
-
+                    <input id="modelo" name="modelo" value="{{ valor_modelo if valor_modelo else '' }}"
+                        placeholder="Modelo de Carro" title="Por favor, preencha o nome do carro" required>
                     {% if erro_modelo %}
                     <span class="erro_texto">{{ erro_modelo }}</span>
                     {% endif %}
@@ -31,22 +32,19 @@
 
                 <div class="input_group">
                     <label for="preco">Preço:</label>
-                    <input id="preco" name="preco" value="{{ carro.preco }}" type="number" required>
-
+                    <input id="preco" name="preco" value="{{ valor_preco if valor_preco else '' }}" placeholder="Preço"
+                        type="number" title="Por favor, preencha o preço do carro" required>
                     {% if erro_preco %}
                     <span class="erro_texto">{{ erro_preco }}</span>
                     {% endif %}
                 </div>
 
                 <div class="input_group">
-                    <label for="ano">Ano de Fabricação:</label>
+                    <label for="ano">Ano:</label>
                     <select id="ano" name="ano" title="Por favor, preencha o ano do carro" required>
-                        <option value="">Selecione um Ano</option>
-    
+                        <option value="">Ano de Fabricação</option>
                         {% for c in anos %}
-                        <option value="{{ c.id }}" {% if carro.ano_id|string==c.id|string %}selected{% endif %}>
-                            {{ c.ano }}
-                        </option>
+                        <option value="{{ c.id }}" {% if valor_ano|string==c.id|string %}selected{% endif %}>{{ c.ano }}</option>
                         {% endfor %}
                     </select>
                     {% if erro_ano %}
@@ -55,40 +53,11 @@
                 </div>
 
                 <div class="input_group">
-                    <label for="cor">Cor:</label>
-                    <select id="cor" name="cor" title="Por favor, preencha a cor do carro" required>
-                        <option value="">Cor do Carro</option>
-                        {% for c in cores %}
-                        <option value="{{ c.id }}" {% if carro.cor_id|string==c.id|string %}selected{% endif %}>{{ c.nome }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    {% if erro_cor %}
-                    <span class="erro_texto">{{ erro_cor }}</span>
-                    {% endif %}
-                </div>
-
-                <div class="input_group">
-                    <label for="tipo_cambio">Tipo de Câmbio:</label>
-                    <select id="tipo_cambio" name="tipo_cambio" title="Por favor, preencha o tipo de câmbio do carro" required>
-                        <option value="">Tipo de Câmbio</option>
-                        {% for c in cambios %}
-                        <option value="{{ c.id }}" {% if carro.tipo_cambio_id|string==c.id|string %}selected{% endif %}>{{
-                            c.nome }}</option>
-                        {% endfor %}
-                    </select>
-                    {% if erro_tipo_cambio %}
-                    <span class="erro_texto">{{ erro_tipo_cambio }}</span>
-                    {% endif %}
-                </div>
-
-                <div class="input_group">
                     <label for="marca">Marca:</label>
                     <select id="marca" name="marca" title="Por favor, preencha a marca do carro" required>
                         <option value="">Marca</option>
-    
                         {% for c in marcas %}
-                        <option value="{{ c.id }}" {% if carro.marca_id|string==c.id|string %}selected{% endif %}>{{ c.nome
+                        <option value="{{ c.id }}" {% if valor_marca|string==c.id|string %}selected{% endif %}>{{ c.nome
                             }}</option>
                         {% endfor %}
                     </select>
@@ -98,11 +67,41 @@
                 </div>
 
                 <div class="input_group">
+                    <label for="cor">Cor:</label>
+                    <select id="cor" name="cor" title="Por favor, preencha a cor do carro" required>
+                        <option value="">Cor do Carro</option>
+                        {% for c in cores %}
+                        <option value="{{ c.id }}" {% if valor_cor|string==c.id|string %}selected{% endif %}>{{ c.nome
+                            }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if erro_cor %}
+                    <span class="erro_texto">{{ erro_cor }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="input_group">
+                    <label for="tipo_cambio">Tipo de Câmbio:</label>
+                    <select id="tipo_cambio" name="tipo_cambio" title="Por favor, preencha o tipo de câmbio do carro"
+                        required>
+                        <option value="">Tipo de Câmbio</option>
+                        {% for c in cambios %}
+                        <option value="{{ c.id }}" {% if valor_tipo_cambio|string==c.id|string %}selected{% endif %}>{{
+                            c.nome }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if erro_tipo_cambio %}
+                    <span class="erro_texto">{{ erro_tipo_cambio }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="input_group">
                     <label for="tipo_combustivel">Tipo de Combustível:</label>
-                    <select id="tipo_combustivel" name="tipo_combustivel" title="Por favor, preencha o tipo de combustível do carro" required>
+                    <select id="tipo_combustivel" name="tipo_combustivel"
+                        title="Por favor, preencha o tipo de combustível do carro" required>
                         <option value="">Combustíveis</option>
                         {% for c in combustiveis %}
-                        <option value="{{ c.id }}" {% if carro.tipo_combustivel_id|string==c.id|string %}selected{% endif
+                        <option value="{{ c.id }}" {% if valor_tipo_combustivel|string==c.id|string %}selected{% endif
                             %}>{{ c.nome }}</option>
                         {% endfor %}
                     </select>
@@ -113,7 +112,7 @@
 
                 <div class="form_footer">
                     <a class="voltar" href="/carros">← Voltar para o Catálogo</a>
-                    <button type="submit">Salvar Alterações</button>
+                    <button type="submit">Adicionar</button>
                 </div>
             </form>
         </div>

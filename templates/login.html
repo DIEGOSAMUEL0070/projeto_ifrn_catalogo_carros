@@ -10,21 +10,20 @@
 <body class="home_background">
     <div class="home_container">
         <div class="home_card">
-            <div class="voltar_a_esquerda">
-                <a class="voltar" href="/">← Voltar</a>
-            </div>
 
             <h1>Login</h1>
 
             <form method="POST">
                 <div class="input_group">
-                    <input type="email" name="email" value="{{ valor_email if valor_email else '' }}" placeholder="Digite seu e-mail" required>
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" name="email" value="{{ valor_email if valor_email else '' }}" placeholder="Digite seu e-mail" required>
                 </div>
 
                 <div class="input_group">
+                    <label for="senha">Senha:</label>
                     <div class="senha">
                         <input type="password" id="senha" name="senha" placeholder="Senha" required>
-                        <button type="button" onclick="mostrarSenha()">
+                        <button type="button" onclick="mostrarSenha('senha')">
                             👁
                         </button>
                     </div>
@@ -36,16 +35,17 @@
                 </div>
                 {% endif %}
 
-                <button type="submit">
-                    Entrar
-                </button>
+                <div class="form_footer">
+                    <a class="voltar" href="/">← Voltar para a Tela Inicial</a>
+                    <button type="submit">Entrar</button>
+                </div>
             </form>
         </div>
     </div>
     
     <script>
-        function mostrarSenha() {
-            const senha = document.getElementById("senha");
+        function mostrarSenha(id) {
+            const senha = document.getElementById(id);
 
             if (senha.type === "password") {
                 senha.type = "text";

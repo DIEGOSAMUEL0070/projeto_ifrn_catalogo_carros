@@ -54,14 +54,13 @@ h1 {
     gap: 15px;
 }
 
-.home_buttons a,
-.voltar {
+.home_buttons a {
     display: inline-block;
     text-decoration: none;
     background: linear-gradient(
         140deg,
-        #00254A,
-        #00183B
+        #00254a,
+        #00183b
     );
 
     color: white;
@@ -72,14 +71,29 @@ h1 {
     margin: 10px 0px;
 }
 
-.home_buttons a:hover,
-.voltar:hover {
+.home_buttons a:hover {
     transform: scale(1.03);
 }
 
-.voltar_a_esquerda {
-    text-align: left;
-    margin-bottom: 20px;
+.voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1.5px solid #00183b;
+    color: #00183b;
+    background: transparent;
+    transition: 0.2s;
+}
+
+.voltar:hover {
+    background: #00183b;
+    color: white;
+    transform: none;
 }
 
 form {
@@ -456,4 +470,96 @@ li {
     font-size: 18px;
     padding: 0;
     margin: 0;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1f2937;
+    color: white;
+    padding: 15px 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.header-direita {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-direita span {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.btn-sair {
+    background-color: #dc3545;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn-sair:hover {
+    background-color: #bb2d3b;
+}
+
+form {
+    text-align: left;
+}
+
+label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #00132c;
+}
+
+.form_footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.cadastro_card .form_footer {
+    grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+    .cadastro_card .form_footer {
+        grid-column: span 1;
+    }
+}
+
+.form_footer button[type="submit"] {
+    margin: 0;
+}
+
+.btn_acao {
+    display: inline-block;
+    text-decoration: none;
+    background: linear-gradient(
+        140deg, 
+        rgb(0, 37, 74),
+        #00183b
+    );
+    color: white;
+    font-weight: bold;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-size: 14px;
+}
+
+.btn_acao:hover {
+    transform: scale(1.03);
 }

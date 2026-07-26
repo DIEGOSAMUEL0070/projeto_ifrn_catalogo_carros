@@ -33,6 +33,7 @@ def login():
         return redirect(url_for("carros_page"))
     
     erro = None
+    email = ""
 
     if request.method == "POST":
         email = request.form.get("email", "").strip()
@@ -70,6 +71,7 @@ def cadastro():
         nome =  request.form.get("nome", "").strip()
         email = request.form.get("email", "").strip()
         senha = request.form.get("senha", "").strip()
+        confirmar_senha = request.form.get("confirmar_senha", "").strip()
 
         if not nome or not email or not senha:
             erro = "Nome, e-mail e senha são obrigatórios."
@@ -80,17 +82,41 @@ def cadastro():
                 valor_email=email
             )
 
+        if senha != confirmar_senha:
+            erro = "As senhas não coincidem. Tente Novamente!"
+            return render_template(
+                "cadastro.html",
+                erro=erro,
+                valor_nome=nome,
+                valor_email=email
+            )
+
         if not email_valido(email):
             erro = "Digite um e-mail válido para o cadastro."
-            return render_template("cadastro.html", erro=erro)
+            return render_template(
+                "cadastro.html", 
+                erro=erro,
+                valor_nome=nome,
+                valor_email=email
+            )
 
         if len(senha) < 4 or len(senha) > 20:
             erro = "Senha inválida. A senha deve ter entre 4 e 20 caracteres."
-            return render_template("cadastro.html", erro=erro)
+            return render_template(
+                "cadastro.html", 
+                erro=erro,
+                valor_nome=nome,
+                valor_email=email
+            )
 
         if model.buscar_usuario_por_email(email):
             erro = "Este e-mail já está cadastrado."
-            return render_template("cadastro.html", erro=erro)
+            return render_template(
+                "cadastro.html",
+                erro=erro,
+                valor_nome=nome,
+                valor_email=email
+            )
         
         model.inserir_usuario(email, senha, nome)
         return redirect(url_for("login"))
@@ -108,11 +134,11 @@ def carros_page():
     if not usuario_logado():
         return redirect(url_for("login"))
     
-    ano_id = request.args.get("ano")
-    marca_id = request.args.get("marca")
-    cor_id = request.args.get("cor")
-    tipo_cambio_id = request.args.get("tipo_cambio")
-    tipo_combustivel_id = request.args.get("tipo_combustivel")
+    ano_id = request.form.get("ano")
+    marca_id = request.form.get("marca")
+    cor_id = request.form.get("cor")
+    tipo_cambio_id = request.form.get("tipo_cambio")
+    tipo_combustivel_id = request.form.get("tipo_combustivel")
 
     carros = model.listar(ano_id, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id)
    
@@ -124,6 +150,21 @@ def carros_page():
         cores = model.listar_cores(),
         cambios = model.listar_cambios(),
         combustiveis = model.listar_combustiveis()
+    )
+
+@app.route("/carros/novo")
+def novo_carro():
+
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return render_template(
+        "cadastrar_carro.html",
+        anos=model.listar_anos(),
+        marcas=model.listar_marcas(),
+        cores=model.listar_cores(),
+        cambios=model.listar_cambios(),
+        combustiveis=model.listar_combustiveis()
     )
 
 @app.route("/cadastrar", methods=["POST"])
@@ -189,8 +230,7 @@ def cadastrar():
         return redirect(url_for("carros_page"))
    
     return render_template(
-        "carros.html",
-        carros = model.listar(), 
+        "cadastrar_carro.html", 
         anos = model.listar_anos(),
         marcas = model.listar_marcas(),
         cores = model.listar_cores(),
