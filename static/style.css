@@ -463,13 +463,19 @@ li {
 
 .senha button {
     position: absolute;
-    right: 10px;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
     border: none;
     background: transparent;
     cursor: pointer;
     font-size: 18px;
     padding: 0;
     margin: 0;
+    line-height: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    filter: grayscale(1) brightness(0.4);
 }
 
 .header {
@@ -562,4 +568,9 @@ label {
 
 .btn_acao:hover {
     transform: scale(1.03);
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
 }

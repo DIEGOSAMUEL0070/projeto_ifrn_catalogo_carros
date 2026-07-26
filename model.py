@@ -275,23 +275,40 @@ def listar(ano_id=None, marca_id=None, cor_id=None, tipo_cambio_id=None, tipo_co
     conn = get_conn()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    query = "SELECT * FROM carros WHERE TRUE"
+    query = """
+        SELECT
+            carros.id,
+            carros.modelo,
+            carros.preco,
+            anos.ano,
+            marcas.nome AS marca,
+            cores.nome AS cor,
+            cambios.nome AS cambio,
+            combustiveis.nome AS combustivel
+        FROM carros
+        LEFT JOIN anos ON carros.ano_id = anos.id
+        LEFT JOIN marcas ON carros.marca_id = marcas.id
+        LEFT JOIN cores ON carros.cor_id = cores.id
+        LEFT JOIN cambios ON carros.tipo_cambio_id = cambios.id
+        LEFT JOIN combustiveis ON carros.tipo_combustivel_id = combustiveis.id
+        WHERE TRUE
+    """
     valores = []
 
     if ano_id:
-        query += " AND ano_id = %s"
+        query += " AND carros.ano_id = %s"
         valores.append(ano_id)
     if marca_id:
-        query += " AND marca_id = %s"
+        query += " AND carros.marca_id = %s"
         valores.append(marca_id)
     if cor_id:
-        query += " AND cor_id = %s"
+        query += " AND carros.cor_id = %s"
         valores.append(cor_id)
     if tipo_cambio_id:
-        query += " AND tipo_cambio_id = %s"
+        query += " AND carros.tipo_cambio_id = %s"
         valores.append(tipo_cambio_id)
     if tipo_combustivel_id:
-        query += " AND tipo_combustivel_id = %s"
+        query += " AND carros.tipo_combustivel_id = %s"
         valores.append(tipo_combustivel_id)
     query += " ORDER BY modelo"
 

@@ -24,7 +24,7 @@ def email_valido(email):
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    return redirect(url_for("login"))
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -322,6 +322,14 @@ def editar(id):
                 id, modelo, ano_id, preco, marca_id, cor_id, tipo_cambio_id, tipo_combustivel_id
             )
             return redirect(url_for("carros_page"))
+
+        carro["modelo"] = modelo
+        carro["preco"] = preco
+        carro["ano_id"] = ano_id
+        carro["marca_id"] = marca_id
+        carro["cor_id"] = cor_id
+        carro["tipo_cambio_id"] = tipo_cambio_id
+        carro["tipo_combustivel_id"] = tipo_combustivel_id
 
     return render_template(
         "editar.html",

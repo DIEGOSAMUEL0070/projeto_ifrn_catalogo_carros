@@ -86,7 +86,7 @@ http://127.0.0.1:5000
 
 ## Banco de Dados
 
-O projeto cria automaticamente o banco de dados e as tabelas quando ececutado pela primeira vez.
+O projeto cria automaticamente o banco de dados e as tabelas quando executado pela primeira vez.
 
 ## Autores
 

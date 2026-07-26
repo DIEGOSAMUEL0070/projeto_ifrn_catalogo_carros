@@ -20,13 +20,6 @@
 
         <div class="secao">
             <div class="secao_titulo">
-                <h2>Carros Cadastrados</h2>
-            </div>
-            <a class="btn_acao" href="/carros/novo">+ Cadastrar Novo Carro</a>
-        </div>
-
-        <div class="secao">
-            <div class="secao_titulo">
                 <h2>Filtros</h2>
             </div>
 
@@ -86,16 +79,20 @@
             </div>
         </div>
 
+        <div class="secao">
+            <div class="page_header" style="margin-bottom: 15px;">
+                <h2>Carros Cadastrados</h2>
+                <a class="btn_acao" href="/carros/novo">+ Cadastrar Novo Carro</a>
+            </div>
+        </div>
+
         <ul class="carros_grid">
             {% for carro in carros %}
             <li>
                 <div class="carro_card">
                     <div class="carro_card_header">
                         <div>
-                            <div class="carro_marca">
-                                {% for m in marcas if m.id|string == carro.marca_id|string %}{{ m.nome }}{% else %}Não
-                                informada{% endfor %}
-                            </div>
+                            <div class="carro_marca">{{ carro.marca if carro.marca else "Não informada" }}</div>
                             <div class="carro_titulo">{{ carro.modelo }}</div>
                         </div>
                     </div>
@@ -105,32 +102,22 @@
                     <div class="carro_specificacoes">
                         <div class="carro_info_item">
                             <div class="carro_info_categoria">Ano</div>
-                            <div class="carro_info_valor">
-                                {% for a in anos if a.id|string == carro.ano_id|string %}
-                                {{ a.ano }}{% else %}Não informado{% endfor%}
-                            </div>
+                            <div class="carro_info_valor">{{ carro.ano if carro.ano else "Não informado" }}</div>
                         </div>
+
                         <div class="carro_info_item">
                             <div class="carro_info_categoria">Cor</div>
-
-                            <div class="carro_info_valor">
-                                {% for c in cores if c.id|string == carro.cor_id|string %}{{ c.nome }}{% else %}Não
-                                informada{% endfor %}
-                            </div>
+                            <div class="carro_info_valor">{{ carro.cor if carro.cor else "Não informada" }}</div>
                         </div>
+
                         <div class="carro_info_item">
                             <div class="carro_info_categoria">Câmbio</div>
-                            <div class="carro_info_valor">
-                                {% for cam in cambios if cam.id|string == carro.tipo_cambio_id|string %}{{ cam.nome }}{%
-                                else %}Não informado{% endfor %}
-                            </div>
+                            <div class="carro_info_valor">{{ carro.cambio if carro.cambio else "Não informado" }}</div>
                         </div>
+
                         <div class="carro_info_item">
                             <div class="carro_info_categoria">Combustível</div>
-                            <div class="carro_info_valor">
-                                {% for comb in combustiveis if comb.id|string == carro.tipo_combustivel_id|string %}{{
-                                comb.nome }}{% else %}Não informado{% endfor %}
-                            </div>
+                            <div class="carro_info_valor">{{ carro.combustivel if carro.combustivel else "Não informado" }}</div>
                         </div>
                     </div>
 
