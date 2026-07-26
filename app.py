@@ -7,11 +7,9 @@ app = Flask(__name__)
 app.secret_key = "fc_company"
     
 model.criar_banco()
-model.criar_tabela()
 
-# model.criar_banco()
-# if model.banco_vazio():
-#     model.restaurar_backup("banco_dados_carro_bck.sql") --- Restauração pelo backup
+if model.banco_vazio():
+    model.restaurar_backup("banco_dados_carro_bck.sql")
 
 def usuario_logado():
     return session.get("logado", False) and "usuario_id" in session

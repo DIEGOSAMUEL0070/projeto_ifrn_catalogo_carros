@@ -193,7 +193,7 @@ def restaurar_backup(arquivo="banco_dados_carro_bck.sql"):
     
     subprocess.run(
         [
-            "psql",
+            r"C:\Program Files\PostgreSQL\18\bin\psql.exe",
             "-h", HOST,
             "-p", PORT,
             "-U", USER,

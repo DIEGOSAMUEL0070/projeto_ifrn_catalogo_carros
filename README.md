@@ -41,7 +41,6 @@ Além disso, possui um sistema de login e cadastro de usuários.
 ├── app.py
 ├── model.py
 ├── templates/
-│ ├── home.html
 │ ├── login.html
 │ ├── cadastro.html
 │ ├── carros.html
