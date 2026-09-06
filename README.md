@@ -1,14 +1,12 @@
-# SABER 
+# FC Company
 
-### Sistema de Assistência de Biblioteca e de Empréstimo Regional
-
-Sistema de Empréstimo de livros desenvolvido como projeto da disciplina de Tópicos Específicos II.
+Sistema de Catálogo de Carros desenvolvido como projeto da disciplina de Programação de Aplicação Web.
 
 ## Objetivo
 
-O sistema permite o cadastro, edição, exclusão, filtragem e gerenciamento de livros utilizando o banco de dados PostgreSQL.
+O sistema permite o cadastro, edição, exclusão, filtragem e gerenciamento de carros utilizando o banco de dados PostgreSQL.
 
-Além disso, possui um sistema de login e cadastro de usuários, possibilitando o 
+Além disso, possui um sistema de login e cadastro de usuários.
 
 ## Algumas Tecnologias utilizadas
 
@@ -24,9 +22,9 @@ Além disso, possui um sistema de login e cadastro de usuários, possibilitando 
 ## Funcionalidades
 - Cadastro de usuários
 - Login
-- Cadastro de livros
-- Edição das informações dos livros
-- Exclusão de livros
+- Cadastro de carros
+- Edição das informações dos carros
+- Exclusão de carros
 - Filtros por:
     - Ano
     - Marca

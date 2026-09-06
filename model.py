@@ -21,7 +21,7 @@ def criar_banco():
     )
 
     conn.autocommit = True
-    cur = conn.cursor() 
+    cur = conn.cursor()
 
     cur.execute(
         "SELECT 1 FROM pg_database WHERE datname = %s",
