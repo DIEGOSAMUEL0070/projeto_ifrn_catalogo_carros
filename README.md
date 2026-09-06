@@ -42,11 +42,11 @@ Além disso, possui um sistema de login e cadastro de usuários, possibilitando 
 │
 ├── app.py
 ├── model.py
-├── banco_dados_carro_bck.sql
 ├── templates/
 │ ├── login.html
 │ ├── cadastro.html
 │ ├── carros.html
+│ ├── gerenciar.html
 │ ├── header.html
 │ ├── cadastrar_carro.html
 │ └── editar.html
